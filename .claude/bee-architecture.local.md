@@ -1,87 +1,88 @@
-## Hexagonal Architecture Implementation — Phase 2
+## Onion Architecture Implementation — Phase 3
 
 ### Pattern
-Hexagonal (Ports & Adapters). Domain core has ZERO infrastructure imports. Dependencies point inward.
+Onion Architecture — four concentric rings with strict inward-only dependency direction.
+
+### Four Layers
+1. **Domain Model** (Ring 1, innermost): Entities, errors, types. ZERO dependencies.
+2. **Domain Services** (Ring 2): Pure business logic + repository interfaces. Depends only on Ring 1.
+3. **Application Services** (Ring 3): Orchestration only. Depends on Ring 1 + Ring 2.
+4. **Infrastructure** (Ring 4, outermost): NestJS, Drizzle, HTTP. Depends on everything inward.
 
 ### Folder Structure
 ```
-hexagonal/src/
-  domain/                          # THE CORE — zero infrastructure imports
-    models/
-      account.ts                   # Account entity with business rules
-      transfer.ts                  # Transfer entity
-    ports/
-      account-repository.port.ts   # Interface: what the domain needs from persistence
-      transfer-repository.port.ts  # Interface: what the domain needs from persistence
-      unit-of-work.port.ts         # Interface: "run these operations atomically"
-    errors/
-      domain-errors.ts             # InsufficientFundsError, AccountNotFoundError, etc.
-
-  application/                     # Orchestration — depends on domain, not on adapters
-    account.service.ts             # Orchestrates account creation/retrieval through ports
-    transfer.service.ts            # Orchestrates transfers through ports (uses UnitOfWork)
-
-  adapters/
-    driving/rest/                  # Inbound — pushes requests INTO the application
+onion/src/
+  domain/
+    model/                           # RING 1 — zero dependencies
+      account.ts                     # Account interface + factory
+      transfer.ts                    # Transfer interface + factory
+      errors.ts                      # All domain error classes
+    services/                        # RING 2 — depends only on domain/model
+      transfer-domain.service.ts     # Pure business logic: insufficient funds check
+      account-repository.interface.ts
+      transfer-repository.interface.ts
+      unit-of-work.interface.ts
+  application/                       # RING 3 — depends on domain/model + domain/services
+    account.service.ts               # Orchestrates account creation/retrieval
+    transfer.service.ts              # Orchestrates transfer workflow
+  infrastructure/                    # RING 4 — outermost, depends on everything inner
+    persistence/drizzle/
+      schema.ts
+      drizzle.provider.ts
+      account-repository.ts
+      transfer-repository.ts
+      unit-of-work.ts
+    rest/
       account.controller.ts
       transfer.controller.ts
-      error-filter.ts              # Maps domain errors to HTTP status codes
-    driven/persistence/drizzle/    # Outbound — implements ports the domain declares
-      schema.ts
-      account-repository.adapter.ts
-      transfer-repository.adapter.ts
-      unit-of-work.adapter.ts      # Implements UnitOfWork with db.transaction()
-      drizzle.provider.ts
-
-  infrastructure/
-    app.module.ts                  # NestJS wiring — binds port tokens to adapters
+      error-filter.ts
+    app.module.ts
     main.ts
 ```
 
-### Transaction Handling — Unit of Work Port
-- Domain declares `UnitOfWork` port: `execute<T>(work: (repos) => Promise<T>): Promise<T>`
-- Application service calls `this.unitOfWork.execute(async ({ accounts, transfers }) => { ... })`
-- Drizzle adapter implements with `db.transaction()`, creating transactional repo instances
-- In-memory test adapter just runs the callback directly
-- Domain says "run this atomically" without knowing HOW
+### The KEY Split: Domain Service vs Application Service
+**Domain Service** (`transfer-domain.service.ts`, Ring 2):
+- Pure function-like: takes domain objects in, returns results out
+- `executeTransfer(source, destination, amount)` → `{ debitedSource, creditedDestination, transfer }` or throws InsufficientFundsError
+- Zero I/O, no repository calls, no NestJS decorators
+- Testable with plain object construction
 
-### NestJS DI Wiring
-- String tokens: `ACCOUNT_REPOSITORY`, `TRANSFER_REPOSITORY`, `UNIT_OF_WORK`
-- Module providers: `{ provide: TOKEN, useClass: DrizzleAdapter }`
-- Application services use `@Inject(TOKEN)` to receive port implementations
-- Application layer imports `@Inject` (DI glue) — acceptable
-- Domain layer imports NOTHING from NestJS
+**Application Service** (`transfer.service.ts`, Ring 3):
+- Orchestration script: validate IDs → load accounts → call domain service → persist results
+- Uses repository interfaces from Ring 2
+- Uses UnitOfWork interface for atomicity
+- NO business rules here — just workflow coordination
 
-### Error Handling
-- Domain throws domain-specific errors (InsufficientFundsError, AccountNotFoundError, InvalidAmountError)
-- Driving adapter has error filter that maps domain errors → HTTP status codes
-- Domain never mentions HTTP
+### Repository Interfaces
+- Declared in `domain/services/` (Ring 2), NOT in Ring 1
+- Ring 1 stays absolutely pure — no interfaces, no tokens
+- Application service (Ring 3) imports from Ring 2
+- Infrastructure (Ring 4) implements them
+
+### Transaction Handling
+- Same UnitOfWork pattern as Hexagonal
+- Interface in `domain/services/unit-of-work.interface.ts` (Ring 2)
+- Application service calls `unitOfWork.execute(...)` (Ring 3)
+- Drizzle adapter implements with `db.transaction()` (Ring 4)
 
 ### Testing Strategy
-- **Domain tests (in-memory adapters, no DB)**: In-memory implementations of all ports. Fast, no Docker needed. Test all business rules.
-- **Integration tests (real DB, full HTTP)**: supertest + real PostgreSQL via docker-compose
-- **In-memory adapters**: Simple Map/Array backed implementations of port interfaces
+| Layer | How to test | Dependencies |
+|-------|------------|-------------|
+| Domain Model (Ring 1) | Pure unit tests | Zero. Construct objects, assert. |
+| Domain Services (Ring 2) | Unit tests with plain objects | Create Account/Transfer by hand. No mocks. |
+| Application Services (Ring 3) | Unit tests with in-memory repos | Simple in-memory implementations. |
+| Infrastructure (Ring 4) | Integration tests | Full HTTP + real PostgreSQL. |
 
 ### Docker Compose
 - PostgreSQL 16 Alpine
-- DB: `hexagonal_bank`, User: `hexagonal`, Password: `hexagonal_local`
-- Port: 5433 (different from N-tier's 5432)
+- DB: `onion_bank`, User: `onion`, Password: `onion_local`
+- Port: 5434 (different from N-tier 5432 and Hexagonal 5433)
 
-### Dependency Direction
-```
-Driving Adapters (REST) --> Application Services --> Domain Core (entities, ports, errors)
-                                                         ^
-Driven Adapters (Drizzle) ---implements ports of---------/
-```
-
-### Key Contrasts with N-tier
-| Concern | N-tier | Hexagonal |
-|---------|--------|-----------|
-| Business rules | Service layer (imports NestJS) | Domain core (no imports) |
-| Repository | Concrete class dependency | Port interface + adapter |
-| Transactions | Service calls db.transaction() | UnitOfWork port, adapter handles |
-| Errors | NestJS exceptions | Domain errors, adapter maps to HTTP |
-| Testability | Needs real DB | In-memory adapters, no DB needed |
+### Key Difference from Hexagonal
+- Hexagonal: single `domain/` layer with models + ports together
+- Onion: domain split into `model/` (Ring 1) and `services/` (Ring 2) with enforced boundary
+- Hexagonal: business logic mixed with orchestration in application service
+- Onion: business logic in domain service, orchestration in application service — structurally separated
 
 ### Slice Order
 Confirmed as-is: Setup+Domain+Create → Read → Transfer → Get Transfer

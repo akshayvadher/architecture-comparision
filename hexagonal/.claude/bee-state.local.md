@@ -5,11 +5,11 @@ risk: ""
 discovery: "not done"
 design_brief: ""
 boundaries: ""
-current_phase: "Phase 2 done — Hexagonal shipped"
-phase_spec: "not yet written"
-architecture: "not yet decided"
+current_phase: "Phase 3: architecture decided"
+phase_spec: "docs/specs/onion-phase-3-spec.md — confirmed"
+architecture: "Onion (4 concentric rings) — domain model/services split, pure domain service for business logic"
 tdd_plan: "not yet written"
-current_slice: ""
+current_slice: "Onion Slice 3 — testing"
 ---
 
 # Bee State
@@ -25,16 +25,16 @@ Risk:
 not done
 
 ## Current Phase
-Phase 2 done — Hexagonal shipped
+Phase 3: architecture decided
 
 ## Phase Spec
-not yet written
+docs/specs/onion-phase-3-spec.md — confirmed
 
 ## Architecture
-not yet decided
+Onion (4 concentric rings) — domain model/services split, pure domain service for business logic
 
 ## Current Slice
-
+Onion Slice 3 — testing
 
 ## TDD Plan
 not yet written
@@ -44,7 +44,5 @@ Phase 1 (N-tier): done
 Phase 2 (Hexagonal): done
 
 ## Slice Progress
-Hex Slice 1: done
-Hex Slice 2: done
-Hex Slice 3: done
-Hex Slice 4: done
+Onion Slice 1: done
+Onion Slice 2: done
