@@ -1,88 +1,80 @@
-## Onion Architecture Implementation — Phase 3
+## Clean Architecture Implementation — Phase 4
 
 ### Pattern
-Onion Architecture — four concentric rings with strict inward-only dependency direction.
+Clean Architecture (Uncle Bob) — four concentric circles with strict inward-only dependency direction, one use case class per operation, explicit input/output DTOs at every use case boundary.
 
-### Four Layers
-1. **Domain Model** (Ring 1, innermost): Entities, errors, types. ZERO dependencies.
-2. **Domain Services** (Ring 2): Pure business logic + repository interfaces. Depends only on Ring 1.
-3. **Application Services** (Ring 3): Orchestration only. Depends on Ring 1 + Ring 2.
-4. **Infrastructure** (Ring 4, outermost): NestJS, Drizzle, HTTP. Depends on everything inward.
+### Four Circles
+1. **Entities** (Circle 1, innermost): Account, Transfer, domain errors. Entities hold their own business rules. ZERO dependencies.
+2. **Use Cases** (Circle 2): One class per operation. Each has explicit input/output DTOs. Gateway interfaces declared here.
+3. **Interface Adapters** (Circle 3): Controllers (HTTP to input DTO), Presenters (output DTO to HTTP response), Error filter.
+4. **Infrastructure** (Circle 4, outermost): NestJS wiring, Drizzle repos, DB schema.
 
 ### Folder Structure
 ```
-onion/src/
-  domain/
-    model/                           # RING 1 — zero dependencies
-      account.ts                     # Account interface + factory
-      transfer.ts                    # Transfer interface + factory
-      errors.ts                      # All domain error classes
-    services/                        # RING 2 — depends only on domain/model
-      transfer-domain.service.ts     # Pure business logic: insufficient funds check
-      account-repository.interface.ts
-      transfer-repository.interface.ts
-      unit-of-work.interface.ts
-  application/                       # RING 3 — depends on domain/model + domain/services
-    account.service.ts               # Orchestrates account creation/retrieval
-    transfer.service.ts              # Orchestrates transfer workflow
-  infrastructure/                    # RING 4 — outermost, depends on everything inner
+clean/src/
+  entities/
+    account.ts
+    transfer.ts
+    errors.ts
+  use-cases/
+    create-account/
+      create-account.use-case.ts
+      create-account.input.ts
+      create-account.output.ts
+    get-account/
+      get-account.use-case.ts
+      get-account.input.ts
+      get-account.output.ts
+    list-accounts/
+      list-accounts.use-case.ts
+      list-accounts.input.ts
+      list-accounts.output.ts
+    initiate-transfer/
+      initiate-transfer.use-case.ts
+      initiate-transfer.input.ts
+      initiate-transfer.output.ts
+    get-transfer/
+      get-transfer.use-case.ts
+      get-transfer.input.ts
+      get-transfer.output.ts
+    gateways/
+      account.gateway.ts
+      transfer.gateway.ts
+      unit-of-work.gateway.ts
+  interface-adapters/
+    controllers/
+      account.controller.ts
+      transfer.controller.ts
+    presenters/
+      account.presenter.ts
+      transfer.presenter.ts
+    error-filter.ts
+  infrastructure/
     persistence/drizzle/
       schema.ts
       drizzle.provider.ts
       account-repository.ts
       transfer-repository.ts
       unit-of-work.ts
-    rest/
-      account.controller.ts
-      transfer.controller.ts
-      error-filter.ts
+      migrations/
     app.module.ts
     main.ts
 ```
 
-### The KEY Split: Domain Service vs Application Service
-**Domain Service** (`transfer-domain.service.ts`, Ring 2):
-- Pure function-like: takes domain objects in, returns results out
-- `executeTransfer(source, destination, amount)` → `{ debitedSource, creditedDestination, transfer }` or throws InsufficientFundsError
-- Zero I/O, no repository calls, no NestJS decorators
-- Testable with plain object construction
+### Entity Design
+Account class with debit()/credit() methods. Constructor validates owner and balance. debit() throws InsufficientFundsError. This collapses Onion Ring 2 (domain services).
 
-**Application Service** (`transfer.service.ts`, Ring 3):
-- Orchestration script: validate IDs → load accounts → call domain service → persist results
-- Uses repository interfaces from Ring 2
-- Uses UnitOfWork interface for atomicity
-- NO business rules here — just workflow coordination
-
-### Repository Interfaces
-- Declared in `domain/services/` (Ring 2), NOT in Ring 1
-- Ring 1 stays absolutely pure — no interfaces, no tokens
-- Application service (Ring 3) imports from Ring 2
-- Infrastructure (Ring 4) implements them
-
-### Transaction Handling
-- Same UnitOfWork pattern as Hexagonal
-- Interface in `domain/services/unit-of-work.interface.ts` (Ring 2)
-- Application service calls `unitOfWork.execute(...)` (Ring 3)
-- Drizzle adapter implements with `db.transaction()` (Ring 4)
+### Use Case Pattern
+constructor(gateway) + execute(input): Promise<output>
+Input/Output DTOs are plain TypeScript types. Gateway interfaces from use-cases/gateways/.
 
 ### Testing Strategy
-| Layer | How to test | Dependencies |
-|-------|------------|-------------|
-| Domain Model (Ring 1) | Pure unit tests | Zero. Construct objects, assert. |
-| Domain Services (Ring 2) | Unit tests with plain objects | Create Account/Transfer by hand. No mocks. |
-| Application Services (Ring 3) | Unit tests with in-memory repos | Simple in-memory implementations. |
-| Infrastructure (Ring 4) | Integration tests | Full HTTP + real PostgreSQL. |
+- Entities: Pure unit tests, zero dependencies
+- Use Cases: Input DTO in, assert output DTO, in-memory gateways
+- Integration: Full HTTP round-trip with real PostgreSQL
 
 ### Docker Compose
-- PostgreSQL 16 Alpine
-- DB: `onion_bank`, User: `onion`, Password: `onion_local`
-- Port: 5434 (different from N-tier 5432 and Hexagonal 5433)
-
-### Key Difference from Hexagonal
-- Hexagonal: single `domain/` layer with models + ports together
-- Onion: domain split into `model/` (Ring 1) and `services/` (Ring 2) with enforced boundary
-- Hexagonal: business logic mixed with orchestration in application service
-- Onion: business logic in domain service, orchestration in application service — structurally separated
+PostgreSQL 16 Alpine, DB: clean_bank, User: clean, Password: clean_local, Port: 5435
 
 ### Slice Order
-Confirmed as-is: Setup+Domain+Create → Read → Transfer → Get Transfer
+Setup+Create -> Read -> Transfer -> Get Transfer
