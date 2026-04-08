@@ -14,7 +14,9 @@
       "Bash(npx drizzle-kit:*)",
       "Bash(docker-compose up:*)",
       "Bash(DATABASE_URL=\"postgresql://ntier:ntier_local@localhost:5432/ntier_bank_test\" npx vitest run)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(ls:*)",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }
