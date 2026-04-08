@@ -1,0 +1,2 @@
+CREATE DATABASE ddd_bank_test;
+GRANT ALL PRIVILEGES ON DATABASE ddd_bank_test TO ddd;

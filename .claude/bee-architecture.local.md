@@ -1,55 +1,42 @@
-## Clean Architecture Implementation — Phase 4
+## DDD Tactical Patterns Implementation — Phase 5
 
 ### Pattern
-Clean Architecture (Uncle Bob) — four concentric circles with strict inward-only dependency direction, one use case class per operation, explicit input/output DTOs at every use case boundary.
+DDD Tactical Patterns — three-layer structure (domain / application / infrastructure) with rich domain model: aggregates, value objects, domain events.
 
-### Four Circles
-1. **Entities** (Circle 1, innermost): Account, Transfer, domain errors. Entities hold their own business rules. ZERO dependencies.
-2. **Use Cases** (Circle 2): One class per operation. Each has explicit input/output DTOs. Gateway interfaces declared here.
-3. **Interface Adapters** (Circle 3): Controllers (HTTP to input DTO), Presenters (output DTO to HTTP response), Error filter.
-4. **Infrastructure** (Circle 4, outermost): NestJS wiring, Drizzle repos, DB schema.
+### Three Layers
+1. **Domain** (innermost): Aggregates, value objects, domain events, errors, repository interfaces. ZERO external dependencies.
+2. **Application**: Thin orchestration services. Load aggregates, invoke methods, persist, dispatch events.
+3. **Infrastructure** (outermost): NestJS controllers, Drizzle repos, framework wiring.
 
 ### Folder Structure
 ```
-clean/src/
-  entities/
-    account.ts
-    transfer.ts
-    errors.ts
-  use-cases/
-    create-account/
-      create-account.use-case.ts
-      create-account.input.ts
-      create-account.output.ts
-    get-account/
-      get-account.use-case.ts
-      get-account.input.ts
-      get-account.output.ts
-    list-accounts/
-      list-accounts.use-case.ts
-      list-accounts.input.ts
-      list-accounts.output.ts
-    initiate-transfer/
-      initiate-transfer.use-case.ts
-      initiate-transfer.input.ts
-      initiate-transfer.output.ts
-    get-transfer/
-      get-transfer.use-case.ts
-      get-transfer.input.ts
-      get-transfer.output.ts
-    gateways/
-      account.gateway.ts
-      transfer.gateway.ts
-      unit-of-work.gateway.ts
-  interface-adapters/
-    controllers/
+ddd/src/
+  domain/
+    value-objects/
+      account-id.ts
+      money.ts
+      transfer-id.ts
+    aggregates/
+      account.ts
+      transfer.ts
+    events/
+      domain-event.ts
+      transfer-completed.ts
+      transfer-failed.ts
+    errors/
+      domain-errors.ts
+    repositories/
+      account-repository.interface.ts
+      transfer-repository.interface.ts
+      unit-of-work.interface.ts
+  application/
+    account.service.ts
+    transfer.service.ts
+  infrastructure/
+    rest/
       account.controller.ts
       transfer.controller.ts
-    presenters/
-      account.presenter.ts
-      transfer.presenter.ts
-    error-filter.ts
-  infrastructure/
+      error-filter.ts
     persistence/drizzle/
       schema.ts
       drizzle.provider.ts
@@ -61,20 +48,33 @@ clean/src/
     main.ts
 ```
 
-### Entity Design
-Account class with debit()/credit() methods. Constructor validates owner and balance. debit() throws InsufficientFundsError. This collapses Onion Ring 2 (domain services).
+### Value Objects
+- AccountId: wraps UUID, validates format, value equality
+- Money: wraps number, rejects negative, immutable add/subtract returning new Money
+- TransferId: wraps UUID, validates format, value equality
+- Plain TypeScript classes, constructor validates, all fields readonly
 
-### Use Case Pattern
-constructor(gateway) + execute(input): Promise<output>
-Input/Output DTOs are plain TypeScript types. Gateway interfaces from use-cases/gateways/.
+### Aggregates
+- Account: takes AccountId, Money, owner, status. debit(Money) checks balance, credit(Money) adds. No setBalance().
+- Transfer: holds events as private array, exposes via domainEvents getter
+
+### Domain Events
+- TransferCompleted, TransferFailed: plain TypeScript types
+- Created during operation, collected, stored in DB after transaction commits
+- No external event bus
+
+### Repositories
+- Interfaces in domain/repositories/
+- Implementations decompose aggregates to DB rows, reconstitute full aggregates with value objects
 
 ### Testing Strategy
-- Entities: Pure unit tests, zero dependencies
-- Use Cases: Input DTO in, assert output DTO, in-memory gateways
-- Integration: Full HTTP round-trip with real PostgreSQL
+- Value objects: pure unit tests, zero deps
+- Aggregates: unit tests with value objects only
+- Application services: unit tests with in-memory repos
+- Integration: full HTTP round-trip with real PostgreSQL
 
 ### Docker Compose
-PostgreSQL 16 Alpine, DB: clean_bank, User: clean, Password: clean_local, Port: 5435
+PostgreSQL 16 Alpine, DB: ddd_bank, User: ddd, Password: ddd_local, Port: 5436
 
 ### Slice Order
-Setup+Create -> Read -> Transfer -> Get Transfer
+Confirmed: Setup+ValueObjects+Create -> Read -> Transfer+Events -> GetTransfer+Events
