@@ -1,4 +1,4 @@
-import { Account } from '../../entities/account';
+import type { Account } from '../../entities/account';
 
 export const ACCOUNT_GATEWAY = Symbol('ACCOUNT_GATEWAY');
 

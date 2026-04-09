@@ -1,16 +1,15 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/infrastructure/app.module';
-import { db, TEST_DATABASE_URL } from './setup';
 import {
   accountReadModel,
   events,
 } from '../src/infrastructure/persistence/schema';
-import { eq } from 'drizzle-orm';
 import { AccountProjector } from '../src/projections/account.projector';
-import { DRIZZLE } from '../src/infrastructure/persistence/database';
+import { db, TEST_DATABASE_URL } from './setup';
 
 describe('Account Projections and Queries — Integration (HTTP + real DB)', () => {
   let app: INestApplication;
@@ -226,9 +225,7 @@ describe('Account Projections and Queries — Integration (HTTP + real DB)', () 
     expect(storedEvents.length).toBeGreaterThanOrEqual(1);
 
     // Delete only the read model row — leave the event store intact
-    await db
-      .delete(accountReadModel)
-      .where(eq(accountReadModel.id, accountId));
+    await db.delete(accountReadModel).where(eq(accountReadModel.id, accountId));
 
     // GET should return 404 because the query reads from the projection, not the event store
     await request(app.getHttpServer())
@@ -245,9 +242,7 @@ describe('Account Projections and Queries — Integration (HTTP + real DB)', () 
     const accountId = createResponse.body.id;
 
     // Delete the read model row
-    await db
-      .delete(accountReadModel)
-      .where(eq(accountReadModel.id, accountId));
+    await db.delete(accountReadModel).where(eq(accountReadModel.id, accountId));
 
     // List should not include this account
     const listResponse = await request(app.getHttpServer())

@@ -1,7 +1,7 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../../src/app.module';
 import { DRIZZLE } from '../../src/database/drizzle.provider';
 import { db } from '../setup';

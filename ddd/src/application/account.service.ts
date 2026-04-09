@@ -1,10 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { Account } from '../domain/aggregates/account';
 import { AccountNotFoundError } from '../domain/errors/domain-errors';
 import {
   ACCOUNT_REPOSITORY,
-  AccountRepository,
+  type AccountRepository,
 } from '../domain/repositories/account-repository.interface';
 import { AccountId } from '../domain/value-objects/account-id';
 import { Money } from '../domain/value-objects/money';

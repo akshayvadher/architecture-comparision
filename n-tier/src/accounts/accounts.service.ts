@@ -1,6 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { AccountsRepository } from './accounts.repository';
+import type { AccountsRepository } from './accounts.repository';
 
 export interface Account {
   id: string;
@@ -44,7 +48,8 @@ export class AccountsService {
   }
 
   private validateUuid(id: string): void {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(id)) {
       throw new BadRequestException(`Invalid account id format: ${id}`);
     }
@@ -62,7 +67,12 @@ export class AccountsService {
     }
   }
 
-  private toAccount(row: { id: string; owner: string; balance: string; status: string }): Account {
+  private toAccount(row: {
+    id: string;
+    owner: string;
+    balance: string;
+    status: string;
+  }): Account {
     return {
       id: row.id,
       owner: row.owner,

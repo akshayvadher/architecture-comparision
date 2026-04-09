@@ -1,5 +1,5 @@
-import { Transfer } from '../src/domain/models/transfer';
-import { TransferRepositoryPort } from '../src/domain/ports/transfer-repository.port';
+import type { Transfer } from '../src/domain/models/transfer';
+import type { TransferRepositoryPort } from '../src/domain/ports/transfer-repository.port';
 
 export class InMemoryTransferRepository implements TransferRepositoryPort {
   private transfers: Map<string, Transfer> = new Map();

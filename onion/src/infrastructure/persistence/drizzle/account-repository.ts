@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { Account } from '../../../domain/model/account';
-import { AccountRepository } from '../../../domain/services/account-repository.interface';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import type { Account } from '../../../domain/model/account';
+import type { AccountRepository } from '../../../domain/services/account-repository.interface';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { accounts } from './schema';
 
 @Injectable()
@@ -44,7 +44,12 @@ export class DrizzleAccountRepository implements AccountRepository {
       .where(eq(accounts.id, id));
   }
 
-  private toDomain(row: { id: string; owner: string; balance: string; status: string }): Account {
+  private toDomain(row: {
+    id: string;
+    owner: string;
+    balance: string;
+    status: string;
+  }): Account {
     return {
       id: row.id,
       owner: row.owner,

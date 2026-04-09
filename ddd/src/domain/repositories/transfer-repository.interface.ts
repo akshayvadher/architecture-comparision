@@ -1,5 +1,5 @@
-import { Transfer } from '../aggregates/transfer';
-import { TransferId } from '../value-objects/transfer-id';
+import type { Transfer } from '../aggregates/transfer';
+import type { TransferId } from '../value-objects/transfer-id';
 
 export const TRANSFER_REPOSITORY = Symbol('TRANSFER_REPOSITORY');
 

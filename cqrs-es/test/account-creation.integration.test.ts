@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { AppModule } from '../src/infrastructure/app.module';
-import { db, TEST_DATABASE_URL } from './setup';
-import { events } from '../src/infrastructure/persistence/schema';
 import { eq } from 'drizzle-orm';
+import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Account } from '../src/domain/aggregates/account';
-import { AccountEvent } from '../src/domain/events/account-events';
+import type { AccountEvent } from '../src/domain/events/account-events';
+import { AppModule } from '../src/infrastructure/app.module';
+import { events } from '../src/infrastructure/persistence/schema';
+import { db, TEST_DATABASE_URL } from './setup';
 
 describe('Account Creation via CQRS/ES — Integration (HTTP + real DB)', () => {
   let app: INestApplication;
@@ -154,8 +154,6 @@ describe('Account Creation via CQRS/ES — Integration (HTTP + real DB)', () => 
       timestamp: new Date(),
     };
 
-    await expect(
-      db.insert(events).values(conflictingRow),
-    ).rejects.toThrow();
+    await expect(db.insert(events).values(conflictingRow)).rejects.toThrow();
   });
 });

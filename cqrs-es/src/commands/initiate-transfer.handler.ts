@@ -5,14 +5,14 @@ import {
   InsufficientFundsError,
   InvalidAmountError,
 } from '../domain/errors/domain-errors';
-import {
+import type {
   TransferCompletedEvent,
   TransferFailedEvent,
   TransferInitiatedEvent,
 } from '../domain/events/transfer-events';
-import { EventStore } from '../infrastructure/event-store/event-store';
-import { AccountProjector } from '../projections/account.projector';
-import { TransferProjector } from '../projections/transfer.projector';
+import type { EventStore } from '../infrastructure/event-store/event-store';
+import type { AccountProjector } from '../projections/account.projector';
+import type { TransferProjector } from '../projections/transfer.projector';
 
 export interface TransferResult {
   id: string;

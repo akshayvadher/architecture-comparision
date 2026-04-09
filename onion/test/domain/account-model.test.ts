@@ -1,6 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { createAccount } from '../../src/domain/model/account';
-import { InvalidOwnerError, InvalidBalanceError } from '../../src/domain/model/errors';
+import {
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from '../../src/domain/model/errors';
 
 describe('Account domain model', () => {
   describe('createAccount factory', () => {
@@ -23,7 +26,9 @@ describe('Account domain model', () => {
     });
 
     it('rejects negative initial balance', () => {
-      expect(() => createAccount('id-1', 'Alice', -1)).toThrow(InvalidBalanceError);
+      expect(() => createAccount('id-1', 'Alice', -1)).toThrow(
+        InvalidBalanceError,
+      );
     });
 
     it('rejects negative balance with descriptive message', () => {
@@ -37,11 +42,15 @@ describe('Account domain model', () => {
     });
 
     it('rejects whitespace-only owner name', () => {
-      expect(() => createAccount('id-1', '   ', 100)).toThrow(InvalidOwnerError);
+      expect(() => createAccount('id-1', '   ', 100)).toThrow(
+        InvalidOwnerError,
+      );
     });
 
     it('rejects missing owner with descriptive message', () => {
-      expect(() => createAccount('id-1', '', 100)).toThrow('Owner name is required');
+      expect(() => createAccount('id-1', '', 100)).toThrow(
+        'Owner name is required',
+      );
     });
 
     it('preserves the provided id without modification', () => {

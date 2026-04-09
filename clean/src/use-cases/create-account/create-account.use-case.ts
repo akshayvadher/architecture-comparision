@@ -1,9 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { Account } from '../../entities/account';
-import { ACCOUNT_GATEWAY, AccountGateway } from '../gateways/account.gateway';
-import { CreateAccountInput } from './create-account.input';
-import { CreateAccountOutput } from './create-account.output';
+import {
+  ACCOUNT_GATEWAY,
+  type AccountGateway,
+} from '../gateways/account.gateway';
+import type { CreateAccountInput } from './create-account.input';
+import type { CreateAccountOutput } from './create-account.output';
 
 @Injectable()
 export class CreateAccountUseCase {

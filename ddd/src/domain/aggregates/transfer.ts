@@ -1,9 +1,9 @@
-import { DomainEvent } from '../events/domain-event';
-import { TransferCompleted } from '../events/transfer-completed';
-import { TransferFailed } from '../events/transfer-failed';
-import { AccountId } from '../value-objects/account-id';
-import { Money } from '../value-objects/money';
-import { TransferId } from '../value-objects/transfer-id';
+import type { DomainEvent } from '../events/domain-event';
+import type { TransferCompleted } from '../events/transfer-completed';
+import type { TransferFailed } from '../events/transfer-failed';
+import type { AccountId } from '../value-objects/account-id';
+import type { Money } from '../value-objects/money';
+import type { TransferId } from '../value-objects/transfer-id';
 
 export type TransferStatus = 'COMPLETED' | 'FAILED';
 
@@ -26,7 +26,14 @@ export class Transfer {
     amount: Money,
     timestamp: Date,
   ): Transfer {
-    const transfer = new Transfer(id, fromAccountId, toAccountId, amount, timestamp, 'COMPLETED');
+    const transfer = new Transfer(
+      id,
+      fromAccountId,
+      toAccountId,
+      amount,
+      timestamp,
+      'COMPLETED',
+    );
     const event: TransferCompleted = {
       type: 'TransferCompleted',
       data: {
@@ -49,7 +56,14 @@ export class Transfer {
     timestamp: Date,
     reason: string,
   ): Transfer {
-    const transfer = new Transfer(id, fromAccountId, toAccountId, amount, timestamp, 'FAILED');
+    const transfer = new Transfer(
+      id,
+      fromAccountId,
+      toAccountId,
+      amount,
+      timestamp,
+      'FAILED',
+    );
     const event: TransferFailed = {
       type: 'TransferFailed',
       data: {
@@ -74,7 +88,14 @@ export class Transfer {
     status: TransferStatus,
     events: DomainEvent[],
   ): Transfer {
-    const transfer = new Transfer(id, fromAccountId, toAccountId, amount, timestamp, status);
+    const transfer = new Transfer(
+      id,
+      fromAccountId,
+      toAccountId,
+      amount,
+      timestamp,
+      status,
+    );
     transfer._events.push(...events);
     return transfer;
   }

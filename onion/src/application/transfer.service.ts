@@ -1,26 +1,26 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Transfer, createFailedTransfer } from '../domain/model/transfer';
 import {
   AccountNotFoundError,
+  InsufficientFundsError,
   InvalidAmountError,
   InvalidIdError,
-  InsufficientFundsError,
   TransferNotFoundError,
 } from '../domain/model/errors';
+import { createFailedTransfer, type Transfer } from '../domain/model/transfer';
 import {
   ACCOUNT_REPOSITORY,
-  AccountRepository,
+  type AccountRepository,
 } from '../domain/services/account-repository.interface';
+import { executeTransfer } from '../domain/services/transfer-domain.service';
 import {
   TRANSFER_REPOSITORY,
-  TransferRepository,
+  type TransferRepository,
 } from '../domain/services/transfer-repository.interface';
 import {
   UNIT_OF_WORK,
-  UnitOfWork,
+  type UnitOfWork,
 } from '../domain/services/unit-of-work.interface';
-import { executeTransfer } from '../domain/services/transfer-domain.service';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -71,7 +71,12 @@ export class TransferService {
             throw new AccountNotFoundError(fromAccountId);
           }
 
-          const result = executeTransfer(transferId, source, destination, amount);
+          const result = executeTransfer(
+            transferId,
+            source,
+            destination,
+            amount,
+          );
 
           await accountRepository.updateBalance(
             result.debitedSource.id,

@@ -1,7 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { AccountService } from '../../src/application/account.service';
+import {
+  AccountNotFoundError,
+  InvalidIdError,
+} from '../../src/domain/model/errors';
 import { InMemoryAccountRepository } from '../in-memory-account-repository';
-import { AccountNotFoundError, InvalidIdError } from '../../src/domain/model/errors';
 
 function buildAccountService(repository = new InMemoryAccountRepository()) {
   return { service: new AccountService(repository), repository };

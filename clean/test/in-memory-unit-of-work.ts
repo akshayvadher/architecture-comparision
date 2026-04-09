@@ -1,6 +1,6 @@
-import { AccountGateway } from '../src/use-cases/gateways/account.gateway';
-import { TransferGateway } from '../src/use-cases/gateways/transfer.gateway';
-import { UnitOfWorkGateway } from '../src/use-cases/gateways/unit-of-work.gateway';
+import type { AccountGateway } from '../src/use-cases/gateways/account.gateway';
+import type { TransferGateway } from '../src/use-cases/gateways/transfer.gateway';
+import type { UnitOfWorkGateway } from '../src/use-cases/gateways/unit-of-work.gateway';
 
 export class InMemoryUnitOfWork implements UnitOfWorkGateway {
   constructor(

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { AccountService } from '../../application/account.service';
+import type { AccountService } from '../../application/account.service';
 
 @Controller('accounts')
 export class AccountController {

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { Account } from '../../../domain/aggregates/account';
-import { AccountRepository } from '../../../domain/repositories/account-repository.interface';
+import type { AccountRepository } from '../../../domain/repositories/account-repository.interface';
 import { AccountId } from '../../../domain/value-objects/account-id';
 import { Money } from '../../../domain/value-objects/money';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { accounts } from './schema';
 
 @Injectable()

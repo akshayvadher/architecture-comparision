@@ -1,15 +1,15 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/infrastructure/app.module';
-import { db, TEST_DATABASE_URL } from './setup';
 import {
   accountReadModel,
   events,
 } from '../src/infrastructure/persistence/schema';
-import { eq } from 'drizzle-orm';
 import { AccountProjector } from '../src/projections/account.projector';
+import { db, TEST_DATABASE_URL } from './setup';
 
 describe('Account Projections + Query Endpoints via QueryBus -- Integration (HTTP + real DB)', () => {
   let app: INestApplication;
@@ -145,9 +145,7 @@ describe('Account Projections + Query Endpoints via QueryBus -- Integration (HTT
       expect(Array.isArray(listResponse.body)).toBe(true);
       expect(listResponse.body.length).toBeGreaterThanOrEqual(2);
 
-      const owners = listResponse.body.map(
-        (a: { owner: string }) => a.owner,
-      );
+      const owners = listResponse.body.map((a: { owner: string }) => a.owner);
       expect(owners).toContain('Diana');
       expect(owners).toContain('Eve');
     });
@@ -252,9 +250,7 @@ describe('Account Projections + Query Endpoints via QueryBus -- Integration (HTT
         .expect(200);
 
       expect(listResponse.body.length).toBeGreaterThanOrEqual(1);
-      const owners = listResponse.body.map(
-        (a: { owner: string }) => a.owner,
-      );
+      const owners = listResponse.body.map((a: { owner: string }) => a.owner);
       expect(owners).toContain('Karl');
     });
   });

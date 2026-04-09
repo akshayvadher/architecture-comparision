@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { TransferService } from '../../../src/application/transfer.service';
+import { Account } from '../../../src/domain/aggregates/account';
 import {
   AccountNotFoundError,
   InsufficientFundsError,
@@ -8,7 +9,6 @@ import {
 } from '../../../src/domain/errors/domain-errors';
 import { AccountId } from '../../../src/domain/value-objects/account-id';
 import { Money } from '../../../src/domain/value-objects/money';
-import { Account } from '../../../src/domain/aggregates/account';
 import { InMemoryAccountRepository } from '../../in-memory-account-repository';
 import { InMemoryTransferRepository } from '../../in-memory-transfer-repository';
 import { InMemoryUnitOfWork } from '../../in-memory-unit-of-work';
@@ -56,8 +56,8 @@ describe('TransferService — transfer execution with in-memory repositories', (
       const source = await accountRepo.findById(AccountId.create(sourceId));
       const dest = await accountRepo.findById(AccountId.create(destId));
 
-      expect(source!.balance.value).toBe(700);
-      expect(dest!.balance.value).toBe(800);
+      expect(source?.balance.value).toBe(700);
+      expect(dest?.balance.value).toBe(800);
     });
 
     it('returns transfer with id, accounts, amount, timestamp, and COMPLETED status', async () => {
@@ -114,8 +114,8 @@ describe('TransferService — transfer execution with in-memory repositories', (
       const source = await accountRepo.findById(AccountId.create(sourceId));
       const dest = await accountRepo.findById(AccountId.create(destId));
 
-      expect(source!.balance.value).toBe(1000);
-      expect(dest!.balance.value).toBe(500);
+      expect(source?.balance.value).toBe(1000);
+      expect(dest?.balance.value).toBe(500);
     });
 
     it('persists a FAILED transfer record', async () => {

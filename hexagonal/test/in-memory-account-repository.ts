@@ -1,5 +1,5 @@
-import { Account } from '../src/domain/models/account';
-import { AccountRepositoryPort } from '../src/domain/ports/account-repository.port';
+import type { Account } from '../src/domain/models/account';
+import type { AccountRepositoryPort } from '../src/domain/ports/account-repository.port';
 
 export class InMemoryAccountRepository implements AccountRepositoryPort {
   private accounts: Map<string, Account> = new Map();

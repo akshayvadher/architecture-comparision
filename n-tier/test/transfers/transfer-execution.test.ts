@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
 import { Test } from '@nestjs/testing';
-import { TransfersService } from '../../src/transfers/transfers.service';
-import { TransfersRepository } from '../../src/transfers/transfers.repository';
-import { AccountsService } from '../../src/accounts/accounts.service';
+import { describe, expect, it } from 'vitest';
 import { AccountsRepository } from '../../src/accounts/accounts.repository';
+import { AccountsService } from '../../src/accounts/accounts.service';
 import { DRIZZLE } from '../../src/database/drizzle.provider';
+import { TransfersRepository } from '../../src/transfers/transfers.repository';
+import { TransfersService } from '../../src/transfers/transfers.service';
 import { db } from '../setup';
 
 describe('Transfer Execution', () => {
@@ -36,17 +36,23 @@ describe('Transfer Execution', () => {
       await transfersService.executeTransfer(source.id, destination.id, 150);
 
       const updatedSource = await accountsRepository.findById(source.id);
-      const updatedDestination = await accountsRepository.findById(destination.id);
+      const updatedDestination = await accountsRepository.findById(
+        destination.id,
+      );
 
-      expect(parseFloat(updatedSource!.balance)).toBe(350);
-      expect(parseFloat(updatedDestination!.balance)).toBe(350);
+      expect(parseFloat(updatedSource?.balance)).toBe(350);
+      expect(parseFloat(updatedDestination?.balance)).toBe(350);
     });
 
     it('returns a transfer with id, source, destination, amount, timestamp, and COMPLETED status', async () => {
       const source = await accountsService.createAccount('Alice', 500);
       const destination = await accountsService.createAccount('Bob', 200);
 
-      const transfer = await transfersService.executeTransfer(source.id, destination.id, 100);
+      const transfer = await transfersService.executeTransfer(
+        source.id,
+        destination.id,
+        100,
+      );
 
       expect(transfer.id).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
@@ -65,10 +71,12 @@ describe('Transfer Execution', () => {
       await transfersService.executeTransfer(source.id, destination.id, 300);
 
       const updatedSource = await accountsRepository.findById(source.id);
-      const updatedDestination = await accountsRepository.findById(destination.id);
+      const updatedDestination = await accountsRepository.findById(
+        destination.id,
+      );
 
-      expect(parseFloat(updatedSource!.balance)).toBe(0);
-      expect(parseFloat(updatedDestination!.balance)).toBe(300);
+      expect(parseFloat(updatedSource?.balance)).toBe(0);
+      expect(parseFloat(updatedDestination?.balance)).toBe(300);
     });
   });
 
@@ -91,10 +99,12 @@ describe('Transfer Execution', () => {
       ).rejects.toThrow();
 
       const updatedSource = await accountsRepository.findById(source.id);
-      const updatedDestination = await accountsRepository.findById(destination.id);
+      const updatedDestination = await accountsRepository.findById(
+        destination.id,
+      );
 
-      expect(parseFloat(updatedSource!.balance)).toBe(100);
-      expect(parseFloat(updatedDestination!.balance)).toBe(200);
+      expect(parseFloat(updatedSource?.balance)).toBe(100);
+      expect(parseFloat(updatedDestination?.balance)).toBe(200);
     });
 
     it('creates a FAILED transfer record when rejected for insufficient funds', async () => {
@@ -164,15 +174,21 @@ describe('Transfer Execution', () => {
       const source = await accountsService.createAccount('Alice', 50);
       const destination = await accountsService.createAccount('Bob', 100);
 
-      const sourceBalanceBefore = (await accountsRepository.findById(source.id))!.balance;
-      const destBalanceBefore = (await accountsRepository.findById(destination.id))!.balance;
+      const sourceBalanceBefore = (await accountsRepository.findById(source.id))
+        ?.balance;
+      const destBalanceBefore = (
+        await accountsRepository.findById(destination.id)
+      )?.balance;
 
       await expect(
         transfersService.executeTransfer(source.id, destination.id, 75),
       ).rejects.toThrow();
 
-      const sourceBalanceAfter = (await accountsRepository.findById(source.id))!.balance;
-      const destBalanceAfter = (await accountsRepository.findById(destination.id))!.balance;
+      const sourceBalanceAfter = (await accountsRepository.findById(source.id))
+        ?.balance;
+      const destBalanceAfter = (
+        await accountsRepository.findById(destination.id)
+      )?.balance;
 
       expect(sourceBalanceAfter).toBe(sourceBalanceBefore);
       expect(destBalanceAfter).toBe(destBalanceBefore);
@@ -185,8 +201,12 @@ describe('Transfer Execution', () => {
       await transfersService.executeTransfer(alice.id, bob.id, 200);
       await transfersService.executeTransfer(bob.id, alice.id, 100);
 
-      const aliceBalance = parseFloat((await accountsRepository.findById(alice.id))!.balance);
-      const bobBalance = parseFloat((await accountsRepository.findById(bob.id))!.balance);
+      const aliceBalance = parseFloat(
+        (await accountsRepository.findById(alice.id))?.balance,
+      );
+      const bobBalance = parseFloat(
+        (await accountsRepository.findById(bob.id))?.balance,
+      );
 
       // Total money in the system should be conserved: 1000 + 500 = 1500
       expect(aliceBalance + bobBalance).toBe(1500);

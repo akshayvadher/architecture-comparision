@@ -1,4 +1,13 @@
-import { pgTable, uuid, text, jsonb, integer, timestamp, unique, numeric } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  jsonb,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 export const events = pgTable(
   'events',
@@ -9,7 +18,9 @@ export const events = pgTable(
     eventType: text('event_type').notNull(),
     eventData: jsonb('event_data').notNull(),
     version: integer('version').notNull(),
-    timestamp: timestamp('timestamp', { withTimezone: true }).notNull().defaultNow(),
+    timestamp: timestamp('timestamp', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     unique('aggregate_version_unique').on(table.aggregateId, table.version),

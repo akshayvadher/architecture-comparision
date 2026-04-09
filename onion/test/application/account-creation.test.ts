@@ -1,7 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { AccountService } from '../../src/application/account.service';
+import {
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from '../../src/domain/model/errors';
 import { InMemoryAccountRepository } from '../in-memory-account-repository';
-import { InvalidOwnerError, InvalidBalanceError } from '../../src/domain/model/errors';
 
 function buildAccountService(repository = new InMemoryAccountRepository()) {
   return { service: new AccountService(repository), repository };
@@ -33,13 +36,17 @@ describe('AccountService — account creation', () => {
   it('rejects negative initial balance with InvalidBalanceError', async () => {
     const { service } = buildAccountService();
 
-    await expect(service.createAccount('Alice', -10)).rejects.toThrow(InvalidBalanceError);
+    await expect(service.createAccount('Alice', -10)).rejects.toThrow(
+      InvalidBalanceError,
+    );
   });
 
   it('rejects missing owner name with InvalidOwnerError', async () => {
     const { service } = buildAccountService();
 
-    await expect(service.createAccount('', 100)).rejects.toThrow(InvalidOwnerError);
+    await expect(service.createAccount('', 100)).rejects.toThrow(
+      InvalidOwnerError,
+    );
   });
 
   it('does not persist an account when validation fails', async () => {

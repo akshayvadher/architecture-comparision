@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { AppModule } from '../src/infrastructure/app.module';
-import { db, TEST_DATABASE_URL } from './setup';
-import { transferReadModel } from '../src/infrastructure/persistence/schema';
 import { eq } from 'drizzle-orm';
+import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { AppModule } from '../src/infrastructure/app.module';
+import { transferReadModel } from '../src/infrastructure/persistence/schema';
+import { db, TEST_DATABASE_URL } from './setup';
 
 describe('Transfer Projections + Query Endpoints + Event Stream -- Integration (HTTP + real DB)', () => {
   let app: INestApplication;

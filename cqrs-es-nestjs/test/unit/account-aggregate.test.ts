@@ -1,15 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { Account } from '../../src/domain/aggregates/account';
-import {
-  AccountCreated,
-  AccountDebited,
-  AccountCredited,
-} from '../../src/domain/events/account-events';
 import {
   InsufficientFundsError,
   InvalidBalanceError,
   InvalidOwnerError,
 } from '../../src/domain/errors/domain-errors';
+import {
+  AccountCreated,
+  AccountCredited,
+  AccountDebited,
+} from '../../src/domain/events/account-events';
 
 const ACCOUNT_ID = '550e8400-e29b-41d4-a716-446655440000';
 const TRANSFER_ID = '660e8400-e29b-41d4-a716-446655440001';

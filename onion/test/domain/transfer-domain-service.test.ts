@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { executeTransfer } from '../../src/domain/services/transfer-domain.service';
-import { Account } from '../../src/domain/model/account';
+import { describe, expect, it } from 'vitest';
+import type { Account } from '../../src/domain/model/account';
 import { InsufficientFundsError } from '../../src/domain/model/errors';
+import { executeTransfer } from '../../src/domain/services/transfer-domain.service';
 
 function buildAccount(overrides: Partial<Account> = {}): Account {
   return {
@@ -83,7 +83,12 @@ describe('Transfer domain service — executeTransfer', () => {
   });
 
   it('preserves all other account fields on the debited source', () => {
-    const source = buildAccount({ id: 'src', owner: 'Alice', balance: 500, status: 'ACTIVE' });
+    const source = buildAccount({
+      id: 'src',
+      owner: 'Alice',
+      balance: 500,
+      status: 'ACTIVE',
+    });
     const destination = buildAccount({ id: 'dst' });
 
     const result = executeTransfer('tx-1', source, destination, 100);
@@ -95,7 +100,12 @@ describe('Transfer domain service — executeTransfer', () => {
 
   it('preserves all other account fields on the credited destination', () => {
     const source = buildAccount({ id: 'src' });
-    const destination = buildAccount({ id: 'dst', owner: 'Bob', balance: 200, status: 'ACTIVE' });
+    const destination = buildAccount({
+      id: 'dst',
+      owner: 'Bob',
+      balance: 200,
+      status: 'ACTIVE',
+    });
 
     const result = executeTransfer('tx-1', source, destination, 100);
 

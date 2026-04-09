@@ -1,4 +1,4 @@
-import { Transfer } from '../../entities/transfer';
+import type { Transfer } from '../../entities/transfer';
 
 export const TRANSFER_GATEWAY = Symbol('TRANSFER_GATEWAY');
 

@@ -1,16 +1,19 @@
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { randomUUID } from 'crypto';
 import { Account } from '../../../domain/aggregates/account';
-import { Transfer, TransferStatus } from '../../../domain/aggregates/transfer';
-import { DomainEvent } from '../../../domain/events/domain-event';
-import { AccountRepository } from '../../../domain/repositories/account-repository.interface';
-import { TransferRepository } from '../../../domain/repositories/transfer-repository.interface';
-import { UnitOfWork } from '../../../domain/repositories/unit-of-work.interface';
+import {
+  Transfer,
+  type TransferStatus,
+} from '../../../domain/aggregates/transfer';
+import type { DomainEvent } from '../../../domain/events/domain-event';
+import type { AccountRepository } from '../../../domain/repositories/account-repository.interface';
+import type { TransferRepository } from '../../../domain/repositories/transfer-repository.interface';
+import type { UnitOfWork } from '../../../domain/repositories/unit-of-work.interface';
 import { AccountId } from '../../../domain/value-objects/account-id';
 import { Money } from '../../../domain/value-objects/money';
 import { TransferId } from '../../../domain/value-objects/transfer-id';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { accounts, domainEvents, transfers } from './schema';
 
 @Injectable()
@@ -70,7 +73,12 @@ class TransactionalAccountRepository implements AccountRepository {
       .where(eq(accounts.id, id.value));
   }
 
-  private toDomain(row: { id: string; owner: string; balance: string; status: string }): Account {
+  private toDomain(row: {
+    id: string;
+    owner: string;
+    balance: string;
+    status: string;
+  }): Account {
     return new Account(
       AccountId.create(row.id),
       row.owner,

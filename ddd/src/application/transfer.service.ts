@@ -1,24 +1,24 @@
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { Transfer } from '../domain/aggregates/transfer';
-import { DomainEvent } from '../domain/events/domain-event';
 import {
   AccountNotFoundError,
   InsufficientFundsError,
   InvalidAmountError,
   TransferNotFoundError,
 } from '../domain/errors/domain-errors';
+import type { DomainEvent } from '../domain/events/domain-event';
 import {
   ACCOUNT_REPOSITORY,
-  AccountRepository,
+  type AccountRepository,
 } from '../domain/repositories/account-repository.interface';
 import {
   TRANSFER_REPOSITORY,
-  TransferRepository,
+  type TransferRepository,
 } from '../domain/repositories/transfer-repository.interface';
 import {
   UNIT_OF_WORK,
-  UnitOfWork,
+  type UnitOfWork,
 } from '../domain/repositories/unit-of-work.interface';
 import { AccountId } from '../domain/value-objects/account-id';
 import { Money } from '../domain/value-objects/money';
@@ -69,11 +69,22 @@ export class TransferService {
     const timestamp = new Date();
 
     try {
-      return await this.executeTransfer(transferId, fromAccountId, toAccountId, money, timestamp);
+      return await this.executeTransfer(
+        transferId,
+        fromAccountId,
+        toAccountId,
+        money,
+        timestamp,
+      );
     } catch (error) {
       if (error instanceof InsufficientFundsError) {
         const failedTransfer = Transfer.failed(
-          transferId, fromAccountId, toAccountId, money, timestamp, error.message,
+          transferId,
+          fromAccountId,
+          toAccountId,
+          money,
+          timestamp,
+          error.message,
         );
         await this.transferRepository.save(failedTransfer);
       }
@@ -111,23 +122,41 @@ export class TransferService {
     money: Money,
     timestamp: Date,
   ): Promise<TransferResponse> {
-    const transfer = await this.unitOfWork.execute(async ({ accountRepository, transferRepository }) => {
-      const sourceAccount = (await accountRepository.findById(fromAccountId))!;
-      const destAccount = (await accountRepository.findById(toAccountId))!;
+    const transfer = await this.unitOfWork.execute(
+      async ({ accountRepository, transferRepository }) => {
+        const sourceAccount = await accountRepository.findById(fromAccountId);
+        if (!sourceAccount) {
+          throw new AccountNotFoundError(fromAccountId.value);
+        }
+        const destAccount = await accountRepository.findById(toAccountId);
+        if (!destAccount) {
+          throw new AccountNotFoundError(toAccountId.value);
+        }
 
-      sourceAccount.debit(money);
-      destAccount.credit(money);
+        sourceAccount.debit(money);
+        destAccount.credit(money);
 
-      await accountRepository.updateBalance(sourceAccount.id, sourceAccount.balance);
-      await accountRepository.updateBalance(destAccount.id, destAccount.balance);
+        await accountRepository.updateBalance(
+          sourceAccount.id,
+          sourceAccount.balance,
+        );
+        await accountRepository.updateBalance(
+          destAccount.id,
+          destAccount.balance,
+        );
 
-      const completedTransfer = Transfer.completed(
-        transferId, fromAccountId, toAccountId, money, timestamp,
-      );
-      await transferRepository.save(completedTransfer);
+        const completedTransfer = Transfer.completed(
+          transferId,
+          fromAccountId,
+          toAccountId,
+          money,
+          timestamp,
+        );
+        await transferRepository.save(completedTransfer);
 
-      return completedTransfer;
-    });
+        return completedTransfer;
+      },
+    );
 
     return toTransferResponse(transfer);
   }
@@ -145,7 +174,11 @@ function toTransferResponse(transfer: Transfer): TransferResponse {
   };
 }
 
-function toEventResponse(event: DomainEvent): { type: string; data: Record<string, unknown>; timestamp: Date } {
+function toEventResponse(event: DomainEvent): {
+  type: string;
+  data: Record<string, unknown>;
+  timestamp: Date;
+} {
   return {
     type: event.type,
     data: event.data,

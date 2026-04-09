@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { Account } from '../../../domain/model/account';
-import { Transfer } from '../../../domain/model/transfer';
-import { AccountRepository } from '../../../domain/services/account-repository.interface';
-import { TransferRepository } from '../../../domain/services/transfer-repository.interface';
-import { UnitOfWork } from '../../../domain/services/unit-of-work.interface';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import type { Account } from '../../../domain/model/account';
+import type { Transfer } from '../../../domain/model/transfer';
+import type { AccountRepository } from '../../../domain/services/account-repository.interface';
+import type { TransferRepository } from '../../../domain/services/transfer-repository.interface';
+import type { UnitOfWork } from '../../../domain/services/unit-of-work.interface';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { accounts, transfers } from './schema';
 
 @Injectable()

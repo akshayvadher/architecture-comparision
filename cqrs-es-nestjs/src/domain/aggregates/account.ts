@@ -1,6 +1,14 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { AccountCreated, AccountDebited, AccountCredited } from '../events/account-events';
-import { InvalidOwnerError, InvalidBalanceError, InsufficientFundsError } from '../errors/domain-errors';
+import {
+  InsufficientFundsError,
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from '../errors/domain-errors';
+import {
+  AccountCreated,
+  AccountCredited,
+  AccountDebited,
+} from '../events/account-events';
 
 export class Account extends AggregateRoot {
   private _id: string = '';
@@ -9,11 +17,21 @@ export class Account extends AggregateRoot {
   private _status: string = '';
   private _version: number = 0;
 
-  get id() { return this._id; }
-  get owner() { return this._owner; }
-  get balance() { return this._balance; }
-  get status() { return this._status; }
-  get version() { return this._version; }
+  get id() {
+    return this._id;
+  }
+  get owner() {
+    return this._owner;
+  }
+  get balance() {
+    return this._balance;
+  }
+  get status() {
+    return this._status;
+  }
+  get version() {
+    return this._version;
+  }
 
   static create(id: string, owner: string, balance: number): Account {
     if (!owner || owner.trim() === '') throw new InvalidOwnerError();

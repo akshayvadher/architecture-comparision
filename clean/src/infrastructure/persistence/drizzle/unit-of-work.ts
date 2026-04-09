@@ -2,10 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { Account } from '../../../entities/account';
 import { Transfer } from '../../../entities/transfer';
-import { AccountGateway } from '../../../use-cases/gateways/account.gateway';
-import { TransferGateway } from '../../../use-cases/gateways/transfer.gateway';
-import { UnitOfWorkGateway } from '../../../use-cases/gateways/unit-of-work.gateway';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import type { AccountGateway } from '../../../use-cases/gateways/account.gateway';
+import type { TransferGateway } from '../../../use-cases/gateways/transfer.gateway';
+import type { UnitOfWorkGateway } from '../../../use-cases/gateways/unit-of-work.gateway';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { accounts, transfers } from './schema';
 
 @Injectable()

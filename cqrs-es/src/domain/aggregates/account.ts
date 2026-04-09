@@ -1,14 +1,14 @@
 import {
+  InsufficientFundsError,
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from '../errors/domain-errors';
+import type {
   AccountCreatedEvent,
   AccountCreditedEvent,
   AccountDebitedEvent,
   AccountEvent,
 } from '../events/account-events';
-import {
-  InsufficientFundsError,
-  InvalidBalanceError,
-  InvalidOwnerError,
-} from '../errors/domain-errors';
 
 export class Account {
   readonly id: string;

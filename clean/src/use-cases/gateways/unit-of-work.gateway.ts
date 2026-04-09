@@ -1,5 +1,5 @@
-import { AccountGateway } from './account.gateway';
-import { TransferGateway } from './transfer.gateway';
+import type { AccountGateway } from './account.gateway';
+import type { TransferGateway } from './transfer.gateway';
 
 export const UNIT_OF_WORK = Symbol('UNIT_OF_WORK');
 

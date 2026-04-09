@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AccountNotFoundError, InvalidIdError } from '../../entities/errors';
-import { ACCOUNT_GATEWAY, AccountGateway } from '../gateways/account.gateway';
-import { GetAccountInput } from './get-account.input';
-import { GetAccountOutput } from './get-account.output';
+import {
+  ACCOUNT_GATEWAY,
+  type AccountGateway,
+} from '../gateways/account.gateway';
+import type { GetAccountInput } from './get-account.input';
+import type { GetAccountOutput } from './get-account.output';
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class GetAccountUseCase {

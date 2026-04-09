@@ -1,5 +1,5 @@
-import { AccountRepositoryPort } from './account-repository.port';
-import { TransferRepositoryPort } from './transfer-repository.port';
+import type { AccountRepositoryPort } from './account-repository.port';
+import type { TransferRepositoryPort } from './transfer-repository.port';
 
 export const UNIT_OF_WORK = 'UNIT_OF_WORK';
 

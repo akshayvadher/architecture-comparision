@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InvalidIdError, TransferNotFoundError } from '../../entities/errors';
-import { TRANSFER_GATEWAY, TransferGateway } from '../gateways/transfer.gateway';
-import { GetTransferInput } from './get-transfer.input';
-import { GetTransferOutput } from './get-transfer.output';
+import {
+  TRANSFER_GATEWAY,
+  type TransferGateway,
+} from '../gateways/transfer.gateway';
+import type { GetTransferInput } from './get-transfer.input';
+import type { GetTransferOutput } from './get-transfer.output';
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class GetTransferUseCase {

@@ -1,11 +1,16 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateAccountCommand } from './create-account.command';
+import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { Account } from '../domain/aggregates/account';
-import { EventStore, DomainEvent } from '../infrastructure/event-store/event-store';
-import { AccountProjector } from '../projections/account.projector';
+import type {
+  DomainEvent,
+  EventStore,
+} from '../infrastructure/event-store/event-store';
+import type { AccountProjector } from '../projections/account.projector';
+import { CreateAccountCommand } from './create-account.command';
 
 @CommandHandler(CreateAccountCommand)
-export class CreateAccountHandler implements ICommandHandler<CreateAccountCommand> {
+export class CreateAccountHandler
+  implements ICommandHandler<CreateAccountCommand>
+{
   constructor(
     private readonly eventStore: EventStore,
     private readonly accountProjector: AccountProjector,

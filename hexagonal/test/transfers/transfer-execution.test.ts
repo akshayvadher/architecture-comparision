@@ -1,25 +1,20 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { TransferService } from '../../src/application/transfer.service';
-import { InMemoryAccountRepository } from '../in-memory-account-repository';
-import { InMemoryTransferRepository } from '../in-memory-transfer-repository';
-import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
 import {
   AccountNotFoundError,
   InsufficientFundsError,
   InvalidAmountError,
-  InvalidIdError,
 } from '../../src/domain/errors/domain-errors';
-import { Account } from '../../src/domain/models/account';
+import type { Account } from '../../src/domain/models/account';
+import { InMemoryAccountRepository } from '../in-memory-account-repository';
+import { InMemoryTransferRepository } from '../in-memory-transfer-repository';
+import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
 
 const ALICE_ID = '11111111-1111-1111-1111-111111111111';
 const BOB_ID = '22222222-2222-2222-2222-222222222222';
 const NON_EXISTENT_ID = '99999999-9999-9999-9999-999999999999';
 
-function makeAccount(
-  id: string,
-  owner: string,
-  balance: number,
-): Account {
+function makeAccount(id: string, owner: string, balance: number): Account {
   return { id, owner, balance, status: 'ACTIVE' };
 }
 
@@ -33,7 +28,11 @@ describe('Transfer Execution — Domain Tests (in-memory, no database)', () => {
     accountRepo = new InMemoryAccountRepository();
     transferRepo = new InMemoryTransferRepository();
     unitOfWork = new InMemoryUnitOfWork(accountRepo, transferRepo);
-    transferService = new TransferService(unitOfWork, transferRepo, accountRepo);
+    transferService = new TransferService(
+      unitOfWork,
+      transferRepo,
+      accountRepo,
+    );
   });
 
   describe('successful transfer', () => {
@@ -45,15 +44,19 @@ describe('Transfer Execution — Domain Tests (in-memory, no database)', () => {
 
       const alice = await accountRepo.findById(ALICE_ID);
       const bob = await accountRepo.findById(BOB_ID);
-      expect(alice!.balance).toBe(800);
-      expect(bob!.balance).toBe(700);
+      expect(alice?.balance).toBe(800);
+      expect(bob?.balance).toBe(700);
     });
 
     it('returns a transfer with id, accounts, amount, timestamp, and COMPLETED status', async () => {
       await accountRepo.save(makeAccount(ALICE_ID, 'Alice', 1000));
       await accountRepo.save(makeAccount(BOB_ID, 'Bob', 500));
 
-      const transfer = await transferService.executeTransfer(ALICE_ID, BOB_ID, 250);
+      const transfer = await transferService.executeTransfer(
+        ALICE_ID,
+        BOB_ID,
+        250,
+      );
 
       expect(transfer.id).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
@@ -69,12 +72,16 @@ describe('Transfer Execution — Domain Tests (in-memory, no database)', () => {
       await accountRepo.save(makeAccount(ALICE_ID, 'Alice', 1000));
       await accountRepo.save(makeAccount(BOB_ID, 'Bob', 500));
 
-      const transfer = await transferService.executeTransfer(ALICE_ID, BOB_ID, 100);
+      const transfer = await transferService.executeTransfer(
+        ALICE_ID,
+        BOB_ID,
+        100,
+      );
 
       const persisted = await transferRepo.findById(transfer.id);
       expect(persisted).toBeDefined();
-      expect(persisted!.status).toBe('COMPLETED');
-      expect(persisted!.amount).toBe(100);
+      expect(persisted?.status).toBe('COMPLETED');
+      expect(persisted?.amount).toBe(100);
     });
   });
 
@@ -100,8 +107,8 @@ describe('Transfer Execution — Domain Tests (in-memory, no database)', () => {
 
       const alice = await accountRepo.findById(ALICE_ID);
       const bob = await accountRepo.findById(BOB_ID);
-      expect(alice!.balance).toBe(50);
-      expect(bob!.balance).toBe(500);
+      expect(alice?.balance).toBe(50);
+      expect(bob?.balance).toBe(500);
     });
 
     it('creates a FAILED transfer record when rejected for insufficient funds', async () => {
@@ -114,9 +121,7 @@ describe('Transfer Execution — Domain Tests (in-memory, no database)', () => {
         // expected
       }
 
-      const allTransfers = Array.from(
-        (transferRepo as any).transfers.values(),
-      );
+      const allTransfers = Array.from((transferRepo as any).transfers.values());
       expect(allTransfers).toHaveLength(1);
       expect(allTransfers[0].status).toBe('FAILED');
     });

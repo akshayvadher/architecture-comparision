@@ -1,4 +1,9 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
+import {
+  type ArgumentsHost,
+  Catch,
+  type ExceptionFilter,
+  HttpStatus,
+} from '@nestjs/common';
 
 const DOMAIN_ERROR_STATUS_MAP = new Map<string, number>([
   ['InvalidOwnerError', HttpStatus.BAD_REQUEST],

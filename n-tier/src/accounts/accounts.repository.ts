@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, sql } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
+import { DRIZZLE, type DrizzleDB } from '../database/drizzle.provider';
 import { accounts } from '../database/schema';
 
 export interface AccountRow {
@@ -34,7 +34,10 @@ export class AccountsRepository {
     return this.db.select().from(accounts);
   }
 
-  async findByIdForUpdate(tx: DrizzleDB, id: string): Promise<AccountRow | undefined> {
+  async findByIdForUpdate(
+    tx: DrizzleDB,
+    id: string,
+  ): Promise<AccountRow | undefined> {
     const result = await tx.execute(
       sql`SELECT id, owner, balance, status FROM accounts WHERE id = ${id} FOR UPDATE`,
     );
@@ -43,7 +46,11 @@ export class AccountsRepository {
     return row as unknown as AccountRow;
   }
 
-  async updateBalance(tx: DrizzleDB, id: string, newBalance: string): Promise<void> {
+  async updateBalance(
+    tx: DrizzleDB,
+    id: string,
+    newBalance: string,
+  ): Promise<void> {
     await tx
       .update(accounts)
       .set({ balance: newBalance })

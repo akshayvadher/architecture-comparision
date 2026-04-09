@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
 import { Test } from '@nestjs/testing';
-import { AccountsService } from '../../src/accounts/accounts.service';
+import { describe, expect, it } from 'vitest';
 import { AccountsRepository } from '../../src/accounts/accounts.repository';
+import { AccountsService } from '../../src/accounts/accounts.service';
 import { DRIZZLE } from '../../src/database/drizzle.provider';
 import { db } from '../setup';
 
@@ -40,21 +40,21 @@ describe('Account Creation', () => {
   });
 
   it('rejects account creation with a negative initial balance', async () => {
-    await expect(
-      accountsService.createAccount('Charlie', -50),
-    ).rejects.toThrow('Initial balance cannot be negative');
+    await expect(accountsService.createAccount('Charlie', -50)).rejects.toThrow(
+      'Initial balance cannot be negative',
+    );
   });
 
   it('rejects account creation without an owner name', async () => {
-    await expect(
-      accountsService.createAccount('', 100),
-    ).rejects.toThrow('Owner name is required');
+    await expect(accountsService.createAccount('', 100)).rejects.toThrow(
+      'Owner name is required',
+    );
   });
 
   it('rejects account creation when owner name is only whitespace', async () => {
-    await expect(
-      accountsService.createAccount('   ', 100),
-    ).rejects.toThrow('Owner name is required');
+    await expect(accountsService.createAccount('   ', 100)).rejects.toThrow(
+      'Owner name is required',
+    );
   });
 
   it('persists the created account in the database', async () => {
@@ -64,9 +64,9 @@ describe('Account Creation', () => {
     const found = await repository.findById(created.id);
 
     expect(found).toBeDefined();
-    expect(found!.id).toBe(created.id);
-    expect(found!.owner).toBe('Diana');
-    expect(parseFloat(found!.balance)).toBe(250);
-    expect(found!.status).toBe('ACTIVE');
+    expect(found?.id).toBe(created.id);
+    expect(found?.owner).toBe('Diana');
+    expect(parseFloat(found?.balance)).toBe(250);
+    expect(found?.status).toBe('ACTIVE');
   });
 });

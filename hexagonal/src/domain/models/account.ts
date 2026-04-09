@@ -1,4 +1,7 @@
-import { InvalidOwnerError, InvalidBalanceError } from '../errors/domain-errors';
+import {
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from '../errors/domain-errors';
 
 export interface Account {
   id: string;
@@ -19,7 +22,11 @@ export function validateInitialBalance(balance: number): void {
   }
 }
 
-export function createAccount(id: string, owner: string, balance: number): Account {
+export function createAccount(
+  id: string,
+  owner: string,
+  balance: number,
+): Account {
   validateOwner(owner);
   validateInitialBalance(balance);
 

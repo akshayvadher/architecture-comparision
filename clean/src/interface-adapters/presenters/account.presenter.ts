@@ -1,5 +1,5 @@
-import { GetAccountOutput } from '../../use-cases/get-account/get-account.output';
-import { ListAccountsOutput } from '../../use-cases/list-accounts/list-accounts.output';
+import type { GetAccountOutput } from '../../use-cases/get-account/get-account.output';
+import type { ListAccountsOutput } from '../../use-cases/list-accounts/list-accounts.output';
 
 export function presentAccount(output: GetAccountOutput) {
   return {

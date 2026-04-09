@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { Account } from '../../src/entities/account';
 import {
-  InvalidOwnerError,
-  InvalidBalanceError,
   InsufficientFundsError,
+  InvalidBalanceError,
+  InvalidOwnerError,
 } from '../../src/entities/errors';
 
 describe('Account entity', () => {

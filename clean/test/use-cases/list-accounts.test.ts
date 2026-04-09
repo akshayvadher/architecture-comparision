@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { Account } from '../../src/entities/account';
 import { ListAccountsUseCase } from '../../src/use-cases/list-accounts/list-accounts.use-case';
 import { InMemoryAccountGateway } from '../in-memory-account-gateway';
-import { Account } from '../../src/entities/account';
 
 function buildUseCase(gateway = new InMemoryAccountGateway()) {
   return { useCase: new ListAccountsUseCase(gateway), gateway };
@@ -9,7 +9,12 @@ function buildUseCase(gateway = new InMemoryAccountGateway()) {
 
 async function seedAccount(
   gateway: InMemoryAccountGateway,
-  overrides: Partial<{ id: string; owner: string; balance: number; status: string }> = {},
+  overrides: Partial<{
+    id: string;
+    owner: string;
+    balance: number;
+    status: string;
+  }> = {},
 ) {
   const account = new Account(
     overrides.id ?? crypto.randomUUID(),

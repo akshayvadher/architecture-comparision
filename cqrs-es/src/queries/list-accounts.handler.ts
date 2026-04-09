@@ -1,7 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE, DrizzleDB } from '../infrastructure/persistence/database';
+import {
+  DRIZZLE,
+  type DrizzleDB,
+} from '../infrastructure/persistence/database';
 import { accountReadModel } from '../infrastructure/persistence/schema';
-import { AccountReadDto } from './get-account.handler';
+import type { AccountReadDto } from './get-account.handler';
 
 @Injectable()
 export class ListAccountsHandler {

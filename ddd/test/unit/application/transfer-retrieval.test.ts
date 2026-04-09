@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { TransferService } from '../../../src/application/transfer.service';
+import { Account } from '../../../src/domain/aggregates/account';
+import { Transfer } from '../../../src/domain/aggregates/transfer';
 import {
   InvalidIdError,
   TransferNotFoundError,
@@ -7,11 +9,9 @@ import {
 import { AccountId } from '../../../src/domain/value-objects/account-id';
 import { Money } from '../../../src/domain/value-objects/money';
 import { TransferId } from '../../../src/domain/value-objects/transfer-id';
-import { Transfer } from '../../../src/domain/aggregates/transfer';
 import { InMemoryAccountRepository } from '../../in-memory-account-repository';
 import { InMemoryTransferRepository } from '../../in-memory-transfer-repository';
 import { InMemoryUnitOfWork } from '../../in-memory-unit-of-work';
-import { Account } from '../../../src/domain/aggregates/account';
 
 describe('TransferService — transfer retrieval with in-memory repositories', () => {
   let accountRepo: InMemoryAccountRepository;
@@ -117,7 +117,8 @@ describe('TransferService — transfer retrieval with in-memory repositories', (
 
     it('includes a TransferFailed domain event with the failure reason', async () => {
       const timestamp = new Date('2026-01-15T10:00:00Z');
-      const reason = 'Insufficient funds in account aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+      const reason =
+        'Insufficient funds in account aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const failedTransfer = Transfer.failed(
         TransferId.create(transferUuid),
         AccountId.create(sourceAccountId),
@@ -147,29 +148,31 @@ describe('TransferService — transfer retrieval with in-memory repositories', (
     it('throws TransferNotFoundError when transfer does not exist', async () => {
       const nonExistentId = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
 
-      await expect(
-        service.getTransferById(nonExistentId),
-      ).rejects.toThrow(TransferNotFoundError);
+      await expect(service.getTransferById(nonExistentId)).rejects.toThrow(
+        TransferNotFoundError,
+      );
     });
   });
 
   describe('invalid transfer id format', () => {
     it('throws InvalidIdError when id is not a valid UUID', async () => {
-      await expect(
-        service.getTransferById('not-a-uuid'),
-      ).rejects.toThrow(InvalidIdError);
+      await expect(service.getTransferById('not-a-uuid')).rejects.toThrow(
+        InvalidIdError,
+      );
     });
 
     it('throws InvalidIdError when id is empty', async () => {
-      await expect(
-        service.getTransferById(''),
-      ).rejects.toThrow(InvalidIdError);
+      await expect(service.getTransferById('')).rejects.toThrow(InvalidIdError);
     });
   });
 
   describe('round-trip through initiateTransfer then getTransferById', () => {
     it('retrieves the same transfer that was created via initiateTransfer', async () => {
-      const created = await service.initiateTransfer(sourceAccountId, destAccountId, 250);
+      const created = await service.initiateTransfer(
+        sourceAccountId,
+        destAccountId,
+        250,
+      );
 
       const retrieved = await service.getTransferById(created.id);
 

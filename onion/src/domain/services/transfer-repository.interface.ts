@@ -1,4 +1,4 @@
-import { Transfer } from '../model/transfer';
+import type { Transfer } from '../model/transfer';
 
 export const TRANSFER_REPOSITORY = 'TRANSFER_REPOSITORY';
 

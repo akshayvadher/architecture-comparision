@@ -1,13 +1,16 @@
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { randomUUID } from 'crypto';
-import { Transfer, TransferStatus } from '../../../domain/aggregates/transfer';
-import { DomainEvent } from '../../../domain/events/domain-event';
-import { TransferRepository } from '../../../domain/repositories/transfer-repository.interface';
+import {
+  Transfer,
+  type TransferStatus,
+} from '../../../domain/aggregates/transfer';
+import type { DomainEvent } from '../../../domain/events/domain-event';
+import type { TransferRepository } from '../../../domain/repositories/transfer-repository.interface';
 import { AccountId } from '../../../domain/value-objects/account-id';
 import { Money } from '../../../domain/value-objects/money';
 import { TransferId } from '../../../domain/value-objects/transfer-id';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { domainEvents, transfers } from './schema';
 
 @Injectable()
@@ -59,7 +62,14 @@ export class DrizzleTransferRepository implements TransferRepository {
   }
 
   private toDomain(
-    row: { id: string; fromAccountId: string; toAccountId: string; amount: string; timestamp: Date; status: string },
+    row: {
+      id: string;
+      fromAccountId: string;
+      toAccountId: string;
+      amount: string;
+      timestamp: Date;
+      status: string;
+    },
     eventRows: { type: string; data: unknown; timestamp: Date }[],
   ): Transfer {
     const events: DomainEvent[] = eventRows.map((e) => ({

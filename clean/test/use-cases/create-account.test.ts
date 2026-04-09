@@ -1,7 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import {
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from '../../src/entities/errors';
 import { CreateAccountUseCase } from '../../src/use-cases/create-account/create-account.use-case';
 import { InMemoryAccountGateway } from '../in-memory-account-gateway';
-import { InvalidOwnerError, InvalidBalanceError } from '../../src/entities/errors';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -30,9 +33,9 @@ describe('CreateAccountUseCase', () => {
     const persisted = await gateway.findById(output.id);
 
     expect(persisted).toBeDefined();
-    expect(persisted!.owner).toBe('Bob');
-    expect(persisted!.balance).toBe(200);
-    expect(persisted!.status).toBe('ACTIVE');
+    expect(persisted?.owner).toBe('Bob');
+    expect(persisted?.balance).toBe(200);
+    expect(persisted?.status).toBe('ACTIVE');
   });
 
   it('rejects negative initial balance with InvalidBalanceError', async () => {
@@ -46,9 +49,9 @@ describe('CreateAccountUseCase', () => {
   it('rejects missing owner name with InvalidOwnerError', async () => {
     const { useCase } = buildUseCase();
 
-    await expect(
-      useCase.execute({ owner: '', balance: 100 }),
-    ).rejects.toThrow(InvalidOwnerError);
+    await expect(useCase.execute({ owner: '', balance: 100 })).rejects.toThrow(
+      InvalidOwnerError,
+    );
   });
 
   it('does not persist an account when validation fails', async () => {

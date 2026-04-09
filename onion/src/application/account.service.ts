@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Account, createAccount } from '../domain/model/account';
+import { type Account, createAccount } from '../domain/model/account';
 import { AccountNotFoundError, InvalidIdError } from '../domain/model/errors';
 import {
   ACCOUNT_REPOSITORY,
-  AccountRepository,
+  type AccountRepository,
 } from '../domain/services/account-repository.interface';
 
 const UUID_REGEX =

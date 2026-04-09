@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { asc, eq } from 'drizzle-orm';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/infrastructure/app.module';
-import { db, TEST_DATABASE_URL } from './setup';
 import {
   accountReadModel,
   events,
 } from '../src/infrastructure/persistence/schema';
-import { eq, asc, and } from 'drizzle-orm';
+import { db, TEST_DATABASE_URL } from './setup';
 
 describe('Transfer Command + Business Rules via CommandBus -- Integration (HTTP + real DB)', () => {
   let app: INestApplication;
@@ -349,9 +349,7 @@ describe('Transfer Command + Business Rules via CommandBus -- Integration (HTTP 
       const allEvents = await db
         .select()
         .from(events)
-        .where(
-          eq(events.aggregateId, transferId),
-        )
+        .where(eq(events.aggregateId, transferId))
         .orderBy(asc(events.version));
 
       const transferEventTypes = allEvents.map((e) => e.eventType);

@@ -1,19 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
-import { Transfer } from '../../entities/transfer';
 import {
   AccountNotFoundError,
   InsufficientFundsError,
   InvalidAmountError,
   InvalidIdError,
 } from '../../entities/errors';
-import { ACCOUNT_GATEWAY, AccountGateway } from '../gateways/account.gateway';
-import { TRANSFER_GATEWAY, TransferGateway } from '../gateways/transfer.gateway';
-import { UNIT_OF_WORK, UnitOfWorkGateway } from '../gateways/unit-of-work.gateway';
-import { InitiateTransferInput } from './initiate-transfer.input';
-import { InitiateTransferOutput } from './initiate-transfer.output';
+import { Transfer } from '../../entities/transfer';
+import {
+  ACCOUNT_GATEWAY,
+  type AccountGateway,
+} from '../gateways/account.gateway';
+import {
+  TRANSFER_GATEWAY,
+  type TransferGateway,
+} from '../gateways/transfer.gateway';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWorkGateway,
+} from '../gateways/unit-of-work.gateway';
+import type { InitiateTransferInput } from './initiate-transfer.input';
+import type { InitiateTransferOutput } from './initiate-transfer.output';
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class InitiateTransferUseCase {
@@ -40,25 +50,41 @@ export class InitiateTransferUseCase {
   private async executeTransfer(
     input: InitiateTransferInput,
   ): Promise<InitiateTransferOutput> {
-    return this.unitOfWork.execute(async ({ accountGateway, transferGateway }) => {
-      const sourceAccount = await accountGateway.findById(input.fromAccountId);
-      const destinationAccount = await accountGateway.findById(input.toAccountId);
+    return this.unitOfWork.execute(
+      async ({ accountGateway, transferGateway }) => {
+        const sourceAccount = await accountGateway.findById(
+          input.fromAccountId,
+        );
+        const destinationAccount = await accountGateway.findById(
+          input.toAccountId,
+        );
 
-      sourceAccount!.debit(input.amount);
-      destinationAccount!.credit(input.amount);
+        sourceAccount?.debit(input.amount);
+        destinationAccount?.credit(input.amount);
 
-      await accountGateway.updateBalance(sourceAccount!.id, sourceAccount!.balance);
-      await accountGateway.updateBalance(destinationAccount!.id, destinationAccount!.balance);
+        await accountGateway.updateBalance(
+          sourceAccount?.id,
+          sourceAccount?.balance,
+        );
+        await accountGateway.updateBalance(
+          destinationAccount?.id,
+          destinationAccount?.balance,
+        );
 
-      const transfer = await transferGateway.save(
-        new Transfer(
-          uuid(), input.fromAccountId, input.toAccountId,
-          input.amount, new Date(), 'COMPLETED',
-        ),
-      );
+        const transfer = await transferGateway.save(
+          new Transfer(
+            uuid(),
+            input.fromAccountId,
+            input.toAccountId,
+            input.amount,
+            new Date(),
+            'COMPLETED',
+          ),
+        );
 
-      return this.toOutput(transfer);
-    });
+        return this.toOutput(transfer);
+      },
+    );
   }
 
   private async validateAccountsExist(
@@ -76,11 +102,17 @@ export class InitiateTransferUseCase {
     }
   }
 
-  private async persistFailedTransfer(input: InitiateTransferInput): Promise<void> {
+  private async persistFailedTransfer(
+    input: InitiateTransferInput,
+  ): Promise<void> {
     await this.transferGateway.save(
       new Transfer(
-        uuid(), input.fromAccountId, input.toAccountId,
-        input.amount, new Date(), 'FAILED',
+        uuid(),
+        input.fromAccountId,
+        input.toAccountId,
+        input.amount,
+        new Date(),
+        'FAILED',
       ),
     );
   }

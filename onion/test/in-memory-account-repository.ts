@@ -1,5 +1,5 @@
-import { Account } from '../src/domain/model/account';
-import { AccountRepository } from '../src/domain/services/account-repository.interface';
+import type { Account } from '../src/domain/model/account';
+import type { AccountRepository } from '../src/domain/services/account-repository.interface';
 
 export class InMemoryAccountRepository implements AccountRepository {
   private accounts = new Map<string, Account>();

@@ -1,5 +1,5 @@
 import { Account } from '../src/domain/aggregates/account';
-import { AccountRepository } from '../src/domain/repositories/account-repository.interface';
+import type { AccountRepository } from '../src/domain/repositories/account-repository.interface';
 import { AccountId } from '../src/domain/value-objects/account-id';
 import { Money } from '../src/domain/value-objects/money';
 

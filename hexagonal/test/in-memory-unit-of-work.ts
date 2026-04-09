@@ -1,6 +1,6 @@
-import { AccountRepositoryPort } from '../src/domain/ports/account-repository.port';
-import { TransferRepositoryPort } from '../src/domain/ports/transfer-repository.port';
-import { UnitOfWork } from '../src/domain/ports/unit-of-work.port';
+import type { AccountRepositoryPort } from '../src/domain/ports/account-repository.port';
+import type { TransferRepositoryPort } from '../src/domain/ports/transfer-repository.port';
+import type { UnitOfWork } from '../src/domain/ports/unit-of-work.port';
 
 export class InMemoryUnitOfWork implements UnitOfWork {
   constructor(

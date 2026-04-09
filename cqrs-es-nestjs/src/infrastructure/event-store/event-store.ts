@@ -1,10 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, asc } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../persistence/database';
-import { events } from '../persistence/schema';
+import { asc, eq } from 'drizzle-orm';
 import { ConcurrencyError } from '../../domain/errors/domain-errors';
-import { AccountCreated, AccountDebited, AccountCredited } from '../../domain/events/account-events';
-import { TransferInitiated, TransferCompleted, TransferFailed } from '../../domain/events/transfer-events';
+import {
+  AccountCreated,
+  AccountCredited,
+  AccountDebited,
+} from '../../domain/events/account-events';
+import {
+  TransferCompleted,
+  TransferFailed,
+  TransferInitiated,
+} from '../../domain/events/transfer-events';
+import { DRIZZLE, type DrizzleDB } from '../persistence/database';
+import { events } from '../persistence/schema';
 
 export interface StoredEvent {
   id: string;

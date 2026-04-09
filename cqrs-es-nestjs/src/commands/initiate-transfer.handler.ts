@@ -1,5 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InitiateTransferCommand } from './initiate-transfer.command';
+import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { Account } from '../domain/aggregates/account';
 import {
   AccountNotFoundError,
@@ -7,13 +6,17 @@ import {
   InvalidAmountError,
 } from '../domain/errors/domain-errors';
 import {
-  TransferInitiated,
   TransferCompleted,
   TransferFailed,
+  TransferInitiated,
 } from '../domain/events/transfer-events';
-import { EventStore, DomainEvent } from '../infrastructure/event-store/event-store';
-import { AccountProjector } from '../projections/account.projector';
-import { TransferProjector } from '../projections/transfer.projector';
+import type {
+  DomainEvent,
+  EventStore,
+} from '../infrastructure/event-store/event-store';
+import type { AccountProjector } from '../projections/account.projector';
+import type { TransferProjector } from '../projections/transfer.projector';
+import { InitiateTransferCommand } from './initiate-transfer.command';
 
 interface TransferResult {
   id: string;
@@ -48,7 +51,13 @@ export class InitiateTransferHandler
     const timestamp = new Date().toISOString();
 
     const initiatedEvent = buildDomainEvent(
-      new TransferInitiated(transferId, fromAccountId, toAccountId, amount, timestamp),
+      new TransferInitiated(
+        transferId,
+        fromAccountId,
+        toAccountId,
+        amount,
+        timestamp,
+      ),
     );
 
     const sourceVersion = sourceAccount.version;
@@ -114,7 +123,8 @@ export class InitiateTransferHandler
     );
 
     const sourceEvents = extractUncommittedDomainEvents(sourceAccount);
-    const destinationEvents = extractUncommittedDomainEvents(destinationAccount);
+    const destinationEvents =
+      extractUncommittedDomainEvents(destinationAccount);
 
     await this.eventStore.appendMultiple([
       {

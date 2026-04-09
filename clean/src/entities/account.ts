@@ -1,4 +1,8 @@
-import { InvalidOwnerError, InvalidBalanceError, InsufficientFundsError } from './errors';
+import {
+  InsufficientFundsError,
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from './errors';
 
 export class Account {
   private _balance: number;

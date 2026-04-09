@@ -1,9 +1,9 @@
-import { Pool } from 'pg';
+import * as path from 'node:path';
+import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { sql } from 'drizzle-orm';
+import { Pool } from 'pg';
 import * as schema from '../src/database/schema';
-import * as path from 'path';
 
 const TEST_DATABASE_URL =
   process.env.DATABASE_URL ||

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { Account } from '../../../entities/account';
-import { AccountGateway } from '../../../use-cases/gateways/account.gateway';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import type { AccountGateway } from '../../../use-cases/gateways/account.gateway';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { accounts } from './schema';
 
 @Injectable()
@@ -44,7 +44,12 @@ export class DrizzleAccountRepository implements AccountGateway {
       .where(eq(accounts.id, id));
   }
 
-  private toDomain(row: { id: string; owner: string; balance: string; status: string }): Account {
+  private toDomain(row: {
+    id: string;
+    owner: string;
+    balance: string;
+    status: string;
+  }): Account {
     return new Account(row.id, row.owner, parseFloat(row.balance), row.status);
   }
 }

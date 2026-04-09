@@ -1,5 +1,5 @@
 import { Transfer } from '../src/entities/transfer';
-import { TransferGateway } from '../src/use-cases/gateways/transfer.gateway';
+import type { TransferGateway } from '../src/use-cases/gateways/transfer.gateway';
 
 export class InMemoryTransferGateway implements TransferGateway {
   private transfers = new Map<string, Transfer>();

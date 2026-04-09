@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { Transfer } from '../../../entities/transfer';
-import { TransferGateway } from '../../../use-cases/gateways/transfer.gateway';
-import { DRIZZLE, DrizzleDB } from './drizzle.provider';
+import type { TransferGateway } from '../../../use-cases/gateways/transfer.gateway';
+import { DRIZZLE, type DrizzleDB } from './drizzle.provider';
 import { transfers } from './schema';
 
 @Injectable()

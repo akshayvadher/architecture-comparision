@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ACCOUNT_GATEWAY, AccountGateway } from '../gateways/account.gateway';
-import { ListAccountsOutput } from './list-accounts.output';
+import {
+  ACCOUNT_GATEWAY,
+  type AccountGateway,
+} from '../gateways/account.gateway';
+import type { ListAccountsOutput } from './list-accounts.output';
 
 @Injectable()
 export class ListAccountsUseCase {

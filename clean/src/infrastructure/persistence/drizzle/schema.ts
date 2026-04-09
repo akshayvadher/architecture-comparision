@@ -1,4 +1,4 @@
-import { pgTable, text, numeric, uuid, timestamp } from 'drizzle-orm/pg-core';
+import { numeric, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const accounts = pgTable('accounts', {
   id: uuid('id').primaryKey(),
@@ -9,8 +9,12 @@ export const accounts = pgTable('accounts', {
 
 export const transfers = pgTable('transfers', {
   id: uuid('id').primaryKey(),
-  fromAccountId: uuid('from_account_id').notNull().references(() => accounts.id),
-  toAccountId: uuid('to_account_id').notNull().references(() => accounts.id),
+  fromAccountId: uuid('from_account_id')
+    .notNull()
+    .references(() => accounts.id),
+  toAccountId: uuid('to_account_id')
+    .notNull()
+    .references(() => accounts.id),
   amount: numeric('amount', { precision: 15, scale: 2 }).notNull(),
   timestamp: timestamp('timestamp').notNull().defaultNow(),
   status: text('status').notNull(),

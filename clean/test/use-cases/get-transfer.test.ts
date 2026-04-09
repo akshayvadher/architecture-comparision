@@ -1,8 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import {
+  InvalidIdError,
+  TransferNotFoundError,
+} from '../../src/entities/errors';
+import { Transfer } from '../../src/entities/transfer';
 import { GetTransferUseCase } from '../../src/use-cases/get-transfer/get-transfer.use-case';
 import { InMemoryTransferGateway } from '../in-memory-transfer-gateway';
-import { InvalidIdError, TransferNotFoundError } from '../../src/entities/errors';
-import { Transfer } from '../../src/entities/transfer';
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 const ANOTHER_UUID = '660e8400-e29b-41d4-a716-446655440001';
@@ -86,33 +89,33 @@ describe('GetTransferUseCase', () => {
   it('throws TransferNotFoundError when the transfer does not exist', async () => {
     const { useCase } = buildUseCase();
 
-    await expect(
-      useCase.execute({ transferId: VALID_UUID }),
-    ).rejects.toThrow(TransferNotFoundError);
+    await expect(useCase.execute({ transferId: VALID_UUID })).rejects.toThrow(
+      TransferNotFoundError,
+    );
   });
 
   it('throws InvalidIdError when the id is not a valid UUID', async () => {
     const { useCase } = buildUseCase();
 
-    await expect(
-      useCase.execute({ transferId: 'not-a-uuid' }),
-    ).rejects.toThrow(InvalidIdError);
+    await expect(useCase.execute({ transferId: 'not-a-uuid' })).rejects.toThrow(
+      InvalidIdError,
+    );
   });
 
   it('throws InvalidIdError for an empty string id', async () => {
     const { useCase } = buildUseCase();
 
-    await expect(
-      useCase.execute({ transferId: '' }),
-    ).rejects.toThrow(InvalidIdError);
+    await expect(useCase.execute({ transferId: '' })).rejects.toThrow(
+      InvalidIdError,
+    );
   });
 
   it('throws InvalidIdError for a numeric id', async () => {
     const { useCase } = buildUseCase();
 
-    await expect(
-      useCase.execute({ transferId: '12345' }),
-    ).rejects.toThrow(InvalidIdError);
+    await expect(useCase.execute({ transferId: '12345' })).rejects.toThrow(
+      InvalidIdError,
+    );
   });
 
   it('retrieves the correct transfer when multiple transfers exist', async () => {

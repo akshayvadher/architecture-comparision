@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { AppModule } from '../../src/app.module';
 import { DRIZZLE } from '../../src/database/drizzle.provider';
 import { db } from '../setup';
@@ -77,9 +77,9 @@ describe('POST /accounts (integration)', () => {
     const found = await repository.findById(accountId);
 
     expect(found).toBeDefined();
-    expect(found!.owner).toBe('Charlie');
-    expect(parseFloat(found!.balance)).toBe(500);
-    expect(found!.status).toBe('ACTIVE');
+    expect(found?.owner).toBe('Charlie');
+    expect(parseFloat(found?.balance)).toBe(500);
+    expect(found?.status).toBe('ACTIVE');
   });
 });
 

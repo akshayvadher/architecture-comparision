@@ -1,8 +1,11 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CreateAccountUseCase } from '../../use-cases/create-account/create-account.use-case';
-import { GetAccountUseCase } from '../../use-cases/get-account/get-account.use-case';
-import { ListAccountsUseCase } from '../../use-cases/list-accounts/list-accounts.use-case';
-import { presentAccount, presentAccountList } from '../presenters/account.presenter';
+import type { CreateAccountUseCase } from '../../use-cases/create-account/create-account.use-case';
+import type { GetAccountUseCase } from '../../use-cases/get-account/get-account.use-case';
+import type { ListAccountsUseCase } from '../../use-cases/list-accounts/list-accounts.use-case';
+import {
+  presentAccount,
+  presentAccountList,
+} from '../presenters/account.presenter';
 
 @Controller('accounts')
 export class AccountController {

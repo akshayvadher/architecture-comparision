@@ -1,6 +1,6 @@
-import { Account } from '../model/account';
-import { Transfer, createCompletedTransfer } from '../model/transfer';
+import type { Account } from '../model/account';
 import { InsufficientFundsError } from '../model/errors';
+import { createCompletedTransfer, type Transfer } from '../model/transfer';
 
 export interface TransferResult {
   debitedSource: Account;

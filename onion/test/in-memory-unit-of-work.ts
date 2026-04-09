@@ -1,6 +1,6 @@
-import { AccountRepository } from '../src/domain/services/account-repository.interface';
-import { TransferRepository } from '../src/domain/services/transfer-repository.interface';
-import { UnitOfWork } from '../src/domain/services/unit-of-work.interface';
+import type { AccountRepository } from '../src/domain/services/account-repository.interface';
+import type { TransferRepository } from '../src/domain/services/transfer-repository.interface';
+import type { UnitOfWork } from '../src/domain/services/unit-of-work.interface';
 
 export class InMemoryUnitOfWork implements UnitOfWork {
   constructor(

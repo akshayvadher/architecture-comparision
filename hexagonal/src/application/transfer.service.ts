@@ -1,26 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import {
-  Transfer,
-  createCompletedTransfer,
-  createFailedTransfer,
-} from '../domain/models/transfer';
-import {
   AccountNotFoundError,
   InsufficientFundsError,
   InvalidAmountError,
   InvalidIdError,
   TransferNotFoundError,
 } from '../domain/errors/domain-errors';
-import { UNIT_OF_WORK, UnitOfWork } from '../domain/ports/unit-of-work.port';
 import {
-  TRANSFER_REPOSITORY,
-  TransferRepositoryPort,
-} from '../domain/ports/transfer-repository.port';
+  createCompletedTransfer,
+  createFailedTransfer,
+  type Transfer,
+} from '../domain/models/transfer';
 import {
   ACCOUNT_REPOSITORY,
-  AccountRepositoryPort,
+  type AccountRepositoryPort,
 } from '../domain/ports/account-repository.port';
+import {
+  TRANSFER_REPOSITORY,
+  type TransferRepositoryPort,
+} from '../domain/ports/transfer-repository.port';
+import {
+  UNIT_OF_WORK,
+  type UnitOfWork,
+} from '../domain/ports/unit-of-work.port';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -79,10 +82,7 @@ export class TransferService {
         }
 
         await accounts.updateBalance(fromAccountId, source.balance - amount);
-        await accounts.updateBalance(
-          toAccountId,
-          destination.balance + amount,
-        );
+        await accounts.updateBalance(toAccountId, destination.balance + amount);
 
         const transfer = createCompletedTransfer(
           transferId,
@@ -116,10 +116,7 @@ export class TransferService {
     return transfer;
   }
 
-  private async verifyAccountExists(
-    id: string,
-    label: string,
-  ): Promise<void> {
+  private async verifyAccountExists(id: string, label: string): Promise<void> {
     const account = await this.accountRepository.findById(id);
     if (!account) {
       throw new AccountNotFoundError(id);

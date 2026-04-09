@@ -59,10 +59,7 @@
         "aggregate_version_unique": {
           "name": "aggregate_version_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "aggregate_id",
-            "version"
-          ]
+          "columns": ["aggregate_id", "version"]
         }
       },
       "policies": {},

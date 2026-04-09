@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { TransferService } from '../../application/transfer.service';
+import type { TransferService } from '../../application/transfer.service';
 
 @Controller('transfers')
 export class TransferController {
@@ -7,7 +7,11 @@ export class TransferController {
 
   @Post()
   async create(
-    @Body() body: { fromAccountId: string; toAccountId: string; amount: number },
+    @Body() body: {
+      fromAccountId: string;
+      toAccountId: string;
+      amount: number;
+    },
   ) {
     return this.transferService.initiateTransfer(
       body.fromAccountId,

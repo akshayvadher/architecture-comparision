@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Account } from '../domain/aggregates/account';
-import { EventStore } from '../infrastructure/event-store/event-store';
-import { AccountProjector } from '../projections/account.projector';
+import type { EventStore } from '../infrastructure/event-store/event-store';
+import type { AccountProjector } from '../projections/account.projector';
 
 export interface CreateAccountResult {
   id: string;

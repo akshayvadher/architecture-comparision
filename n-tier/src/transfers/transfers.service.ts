@@ -1,13 +1,13 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
-  Inject,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
-import { AccountsRepository } from '../accounts/accounts.repository';
-import { TransfersRepository, TransferRow } from './transfers.repository';
+import type { AccountsRepository } from '../accounts/accounts.repository';
+import { DRIZZLE, type DrizzleDB } from '../database/drizzle.provider';
+import type { TransferRow, TransfersRepository } from './transfers.repository';
 
 export interface Transfer {
   id: string;
@@ -48,12 +48,17 @@ export class TransfersService {
 
     const sourceExists = await this.accountsRepository.findById(fromAccountId);
     if (!sourceExists) {
-      throw new NotFoundException(`Source account with id ${fromAccountId} not found`);
+      throw new NotFoundException(
+        `Source account with id ${fromAccountId} not found`,
+      );
     }
 
-    const destinationExists = await this.accountsRepository.findById(toAccountId);
+    const destinationExists =
+      await this.accountsRepository.findById(toAccountId);
     if (!destinationExists) {
-      throw new NotFoundException(`Destination account with id ${toAccountId} not found`);
+      throw new NotFoundException(
+        `Destination account with id ${toAccountId} not found`,
+      );
     }
 
     const transferId = uuidv4();
@@ -61,8 +66,12 @@ export class TransfersService {
 
     try {
       const row = await this.db.transaction(async (tx) => {
-        const sourceAccount = await this.accountsRepository.findByIdForUpdate(tx, fromAccountId);
-        const destinationAccount = await this.accountsRepository.findByIdForUpdate(tx, toAccountId);
+        const sourceAccount = await this.accountsRepository.findByIdForUpdate(
+          tx,
+          fromAccountId,
+        );
+        const destinationAccount =
+          await this.accountsRepository.findByIdForUpdate(tx, toAccountId);
 
         if (!sourceAccount || !destinationAccount) {
           throw new NotFoundException('Account disappeared during transaction');
@@ -70,14 +79,28 @@ export class TransfersService {
 
         const sourceBalance = parseFloat(sourceAccount.balance);
         if (sourceBalance < amount) {
-          throw new InsufficientFundsError(fromAccountId, sourceBalance, amount);
+          throw new InsufficientFundsError(
+            fromAccountId,
+            sourceBalance,
+            amount,
+          );
         }
 
         const newSourceBalance = (sourceBalance - amount).toFixed(2);
-        const newDestinationBalance = (parseFloat(destinationAccount.balance) + amount).toFixed(2);
+        const newDestinationBalance = (
+          parseFloat(destinationAccount.balance) + amount
+        ).toFixed(2);
 
-        await this.accountsRepository.updateBalance(tx, fromAccountId, newSourceBalance);
-        await this.accountsRepository.updateBalance(tx, toAccountId, newDestinationBalance);
+        await this.accountsRepository.updateBalance(
+          tx,
+          fromAccountId,
+          newSourceBalance,
+        );
+        await this.accountsRepository.updateBalance(
+          tx,
+          toAccountId,
+          newDestinationBalance,
+        );
 
         return this.transfersRepository.insert(tx, {
           id: transferId,
@@ -111,12 +134,15 @@ export class TransfersService {
 
   private validateAmount(amount: number): void {
     if (amount <= 0) {
-      throw new BadRequestException('Transfer amount must be greater than zero');
+      throw new BadRequestException(
+        'Transfer amount must be greater than zero',
+      );
     }
   }
 
   private validateUuid(id: string, label: string): void {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(id)) {
       throw new BadRequestException(`Invalid ${label} id format: ${id}`);
     }

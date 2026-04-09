@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { Money } from '../../../src/domain/value-objects/money';
+import { describe, expect, it } from 'vitest';
 import { InvalidBalanceError } from '../../../src/domain/errors/domain-errors';
+import { Money } from '../../../src/domain/value-objects/money';
 
 describe('Money value object', () => {
   it('wraps a positive numeric amount', () => {

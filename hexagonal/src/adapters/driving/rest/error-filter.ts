@@ -1,4 +1,9 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
+import {
+  type ArgumentsHost,
+  Catch,
+  type ExceptionFilter,
+  HttpStatus,
+} from '@nestjs/common';
 
 const DOMAIN_ERROR_STATUS_MAP = new Map<string, number>([
   ['InvalidOwnerError', HttpStatus.BAD_REQUEST],
@@ -23,7 +28,9 @@ export class DomainErrorFilter implements ExceptionFilter {
       return;
     }
 
-    const statusCode = DOMAIN_ERROR_STATUS_MAP.get(exception.name) ?? HttpStatus.INTERNAL_SERVER_ERROR;
+    const statusCode =
+      DOMAIN_ERROR_STATUS_MAP.get(exception.name) ??
+      HttpStatus.INTERNAL_SERVER_ERROR;
     response.status(statusCode).json({
       statusCode,
       message: exception.message,

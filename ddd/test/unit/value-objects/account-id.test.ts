@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { AccountId } from '../../../src/domain/value-objects/account-id';
+import { describe, expect, it } from 'vitest';
 import { InvalidIdError } from '../../../src/domain/errors/domain-errors';
+import { AccountId } from '../../../src/domain/value-objects/account-id';
 
 describe('AccountId value object', () => {
   const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';

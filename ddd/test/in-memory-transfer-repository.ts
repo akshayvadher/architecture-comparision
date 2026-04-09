@@ -1,6 +1,6 @@
-import { Transfer } from '../src/domain/aggregates/transfer';
-import { TransferRepository } from '../src/domain/repositories/transfer-repository.interface';
-import { TransferId } from '../src/domain/value-objects/transfer-id';
+import type { Transfer } from '../src/domain/aggregates/transfer';
+import type { TransferRepository } from '../src/domain/repositories/transfer-repository.interface';
+import type { TransferId } from '../src/domain/value-objects/transfer-id';
 
 export class InMemoryTransferRepository implements TransferRepository {
   private transfers = new Map<string, Transfer>();

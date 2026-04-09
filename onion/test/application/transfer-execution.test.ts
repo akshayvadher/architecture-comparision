@@ -1,15 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { TransferService } from '../../src/application/transfer.service';
-import { InMemoryAccountRepository } from '../in-memory-account-repository';
-import { InMemoryTransferRepository } from '../in-memory-transfer-repository';
-import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
+import type { Account } from '../../src/domain/model/account';
 import {
   AccountNotFoundError,
   InsufficientFundsError,
   InvalidAmountError,
   InvalidIdError,
 } from '../../src/domain/model/errors';
-import { Account } from '../../src/domain/model/account';
+import { InMemoryAccountRepository } from '../in-memory-account-repository';
+import { InMemoryTransferRepository } from '../in-memory-transfer-repository';
+import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
 
 const ALICE_ID = '11111111-1111-1111-1111-111111111111';
 const BOB_ID = '22222222-2222-2222-2222-222222222222';
@@ -40,15 +40,19 @@ async function seedAccount(
 describe('TransferService — transfer execution', () => {
   it('debits source and credits destination by the transfer amount', async () => {
     const { service, accountRepo } = buildService();
-    await seedAccount(accountRepo, { id: ALICE_ID, owner: 'Alice', balance: 500 });
+    await seedAccount(accountRepo, {
+      id: ALICE_ID,
+      owner: 'Alice',
+      balance: 500,
+    });
     await seedAccount(accountRepo, { id: BOB_ID, owner: 'Bob', balance: 200 });
 
     await service.executeTransfer(ALICE_ID, BOB_ID, 150);
 
     const alice = await accountRepo.findById(ALICE_ID);
     const bob = await accountRepo.findById(BOB_ID);
-    expect(alice!.balance).toBe(350);
-    expect(bob!.balance).toBe(350);
+    expect(alice?.balance).toBe(350);
+    expect(bob?.balance).toBe(350);
   });
 
   it('returns a COMPLETED transfer with all expected fields', async () => {
@@ -105,8 +109,8 @@ describe('TransferService — transfer execution', () => {
 
     const alice = await accountRepo.findById(ALICE_ID);
     const bob = await accountRepo.findById(BOB_ID);
-    expect(alice!.balance).toBe(50);
-    expect(bob!.balance).toBe(200);
+    expect(alice?.balance).toBe(50);
+    expect(bob?.balance).toBe(200);
   });
 
   it('saves a FAILED transfer record when insufficient funds', async () => {
@@ -141,9 +145,9 @@ describe('TransferService — transfer execution', () => {
     await seedAccount(accountRepo, { id: ALICE_ID, balance: 500 });
     await seedAccount(accountRepo, { id: BOB_ID, balance: 200 });
 
-    await expect(
-      service.executeTransfer(ALICE_ID, BOB_ID, 0),
-    ).rejects.toThrow(InvalidAmountError);
+    await expect(service.executeTransfer(ALICE_ID, BOB_ID, 0)).rejects.toThrow(
+      InvalidAmountError,
+    );
   });
 
   it('rejects negative amount with InvalidAmountError', async () => {
@@ -203,7 +207,7 @@ describe('TransferService — transfer execution', () => {
 
     const alice = await accountRepo.findById(ALICE_ID);
     const bob = await accountRepo.findById(BOB_ID);
-    expect(alice!.balance).toBe(500);
-    expect(bob!.balance).toBe(200);
+    expect(alice?.balance).toBe(500);
+    expect(bob?.balance).toBe(200);
   });
 });

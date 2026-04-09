@@ -1,19 +1,26 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { TransferService } from '../../src/application/transfer.service';
+import {
+  InvalidIdError,
+  TransferNotFoundError,
+} from '../../src/domain/model/errors';
+import { createCompletedTransfer } from '../../src/domain/model/transfer';
 import { InMemoryAccountRepository } from '../in-memory-account-repository';
 import { InMemoryTransferRepository } from '../in-memory-transfer-repository';
 import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
-import {
-  TransferNotFoundError,
-  InvalidIdError,
-} from '../../src/domain/model/errors';
-import { createCompletedTransfer } from '../../src/domain/model/transfer';
 
 function buildTransferService() {
   const accountRepository = new InMemoryAccountRepository();
   const transferRepository = new InMemoryTransferRepository();
-  const unitOfWork = new InMemoryUnitOfWork(accountRepository, transferRepository);
-  const service = new TransferService(unitOfWork, transferRepository, accountRepository);
+  const unitOfWork = new InMemoryUnitOfWork(
+    accountRepository,
+    transferRepository,
+  );
+  const service = new TransferService(
+    unitOfWork,
+    transferRepository,
+    accountRepository,
+  );
   return { service, accountRepository, transferRepository };
 }
 
@@ -46,8 +53,14 @@ describe('TransferService — transfer retrieval by id', () => {
     const retrieved = await service.getTransferById(transfer.id);
 
     expect(retrieved).toHaveProperty('id', transfer.id);
-    expect(retrieved).toHaveProperty('fromAccountId', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
-    expect(retrieved).toHaveProperty('toAccountId', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
+    expect(retrieved).toHaveProperty(
+      'fromAccountId',
+      'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    );
+    expect(retrieved).toHaveProperty(
+      'toAccountId',
+      'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    );
     expect(retrieved).toHaveProperty('amount', 300);
     expect(retrieved).toHaveProperty('timestamp');
     expect(retrieved).toHaveProperty('status', 'COMPLETED');

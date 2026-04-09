@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../../src/infrastructure/app.module';
 import { TEST_DATABASE_URL } from '../setup';
 
@@ -23,7 +23,10 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
     await app.close();
   });
 
-  async function createAccount(owner: string, balance: number): Promise<string> {
+  async function createAccount(
+    owner: string,
+    balance: number,
+  ): Promise<string> {
     const response = await request(app.getHttpServer())
       .post('/accounts')
       .send({ owner, balance })
@@ -223,12 +226,18 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .expect(200);
 
       expect(response.body.id).toBe(createResponse.body.id);
-      expect(response.body.fromAccountId).toBe(createResponse.body.fromAccountId);
+      expect(response.body.fromAccountId).toBe(
+        createResponse.body.fromAccountId,
+      );
       expect(response.body.toAccountId).toBe(createResponse.body.toAccountId);
       expect(response.body.amount).toBe(createResponse.body.amount);
       expect(response.body.status).toBe(createResponse.body.status);
-      expect(response.body.events).toHaveLength(createResponse.body.events.length);
-      expect(response.body.events[0].type).toBe(createResponse.body.events[0].type);
+      expect(response.body.events).toHaveLength(
+        createResponse.body.events.length,
+      );
+      expect(response.body.events[0].type).toBe(
+        createResponse.body.events[0].type,
+      );
     });
   });
 

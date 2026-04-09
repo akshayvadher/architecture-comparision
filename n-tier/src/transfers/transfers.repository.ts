@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
+import { DRIZZLE, type DrizzleDB } from '../database/drizzle.provider';
 import { transfers } from '../database/schema';
 
 export interface TransferRow {
@@ -17,10 +17,7 @@ export class TransfersRepository {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   async insert(tx: DrizzleDB, transfer: TransferRow): Promise<TransferRow> {
-    const [inserted] = await tx
-      .insert(transfers)
-      .values(transfer)
-      .returning();
+    const [inserted] = await tx.insert(transfers).values(transfer).returning();
     return inserted;
   }
 

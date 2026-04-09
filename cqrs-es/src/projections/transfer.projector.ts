@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE, DrizzleDB } from '../infrastructure/persistence/database';
+import {
+  DRIZZLE,
+  type DrizzleDB,
+} from '../infrastructure/persistence/database';
 import { transferReadModel } from '../infrastructure/persistence/schema';
 
 @Injectable()

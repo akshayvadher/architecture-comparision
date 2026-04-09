@@ -10,8 +10,8 @@ import { drizzleProvider } from './persistence/drizzle/drizzle.provider';
 import { DrizzleTransferRepository } from './persistence/drizzle/transfer-repository';
 import { DrizzleUnitOfWork } from './persistence/drizzle/unit-of-work';
 import { AccountController } from './rest/account.controller';
-import { TransferController } from './rest/transfer.controller';
 import { DomainErrorFilter } from './rest/error-filter';
+import { TransferController } from './rest/transfer.controller';
 
 @Module({
   controllers: [AccountController, TransferController],

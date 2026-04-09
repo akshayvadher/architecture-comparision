@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../../src/infrastructure/app.module';
 import { TEST_DATABASE_URL } from '../setup';
 
@@ -151,7 +151,7 @@ describe('Account Retrieval — Integration Tests (HTTP + real DB)', () => {
     it('reconstitutes the aggregate with value objects from persistence', async () => {
       const created = await request(app.getHttpServer())
         .post('/accounts')
-        .send({ owner: 'Bob', balance: 333.50 })
+        .send({ owner: 'Bob', balance: 333.5 })
         .expect(201);
 
       const response = await request(app.getHttpServer())
@@ -160,7 +160,7 @@ describe('Account Retrieval — Integration Tests (HTTP + real DB)', () => {
 
       expect(response.body.id).toBe(created.body.id);
       expect(response.body.owner).toBe('Bob');
-      expect(response.body.balance).toBe(333.50);
+      expect(response.body.balance).toBe(333.5);
       expect(response.body.status).toBe('ACTIVE');
     });
   });

@@ -1,6 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
-import { InitiateTransferHandler } from '../../commands/initiate-transfer.handler';
-import { GetTransferHandler } from '../../queries/get-transfer.handler';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
+import type { InitiateTransferHandler } from '../../commands/initiate-transfer.handler';
+import type { GetTransferHandler } from '../../queries/get-transfer.handler';
 
 @Controller('transfers')
 export class TransferController {
@@ -12,7 +20,11 @@ export class TransferController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @Body() body: { fromAccountId: string; toAccountId: string; amount: number },
+    @Body() body: {
+      fromAccountId: string;
+      toAccountId: string;
+      amount: number;
+    },
   ) {
     return this.initiateTransferHandler.execute(
       body.fromAccountId,

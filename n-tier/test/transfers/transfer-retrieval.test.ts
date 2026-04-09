@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
 import { Test } from '@nestjs/testing';
-import { TransfersService } from '../../src/transfers/transfers.service';
-import { TransfersRepository } from '../../src/transfers/transfers.repository';
-import { AccountsService } from '../../src/accounts/accounts.service';
+import { describe, expect, it } from 'vitest';
 import { AccountsRepository } from '../../src/accounts/accounts.repository';
+import { AccountsService } from '../../src/accounts/accounts.service';
 import { DRIZZLE } from '../../src/database/drizzle.provider';
+import { TransfersRepository } from '../../src/transfers/transfers.repository';
+import { TransfersService } from '../../src/transfers/transfers.service';
 import { db } from '../setup';
 
 describe('Transfer Retrieval', () => {
@@ -88,9 +88,9 @@ describe('Transfer Retrieval', () => {
     });
 
     it('throws error for an empty id', async () => {
-      await expect(
-        transfersService.getTransferById(''),
-      ).rejects.toThrow('Invalid transfer id format');
+      await expect(transfersService.getTransferById('')).rejects.toThrow(
+        'Invalid transfer id format',
+      );
     });
   });
 });

@@ -1,9 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { InitiateTransferUseCase } from '../../src/use-cases/initiate-transfer/initiate-transfer.use-case';
-import { InitiateTransferInput } from '../../src/use-cases/initiate-transfer/initiate-transfer.input';
-import { InMemoryAccountGateway } from '../in-memory-account-gateway';
-import { InMemoryTransferGateway } from '../in-memory-transfer-gateway';
-import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { Account } from '../../src/entities/account';
 import {
   AccountNotFoundError,
@@ -11,6 +6,11 @@ import {
   InvalidAmountError,
   InvalidIdError,
 } from '../../src/entities/errors';
+import type { InitiateTransferInput } from '../../src/use-cases/initiate-transfer/initiate-transfer.input';
+import { InitiateTransferUseCase } from '../../src/use-cases/initiate-transfer/initiate-transfer.use-case';
+import { InMemoryAccountGateway } from '../in-memory-account-gateway';
+import { InMemoryTransferGateway } from '../in-memory-transfer-gateway';
+import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -23,7 +23,9 @@ let transferGateway: InMemoryTransferGateway;
 let unitOfWork: InMemoryUnitOfWork;
 let useCase: InitiateTransferUseCase;
 
-function buildInput(overrides: Partial<InitiateTransferInput> = {}): InitiateTransferInput {
+function buildInput(
+  overrides: Partial<InitiateTransferInput> = {},
+): InitiateTransferInput {
   return {
     fromAccountId: SOURCE_ID,
     toAccountId: DEST_ID,
@@ -32,7 +34,11 @@ function buildInput(overrides: Partial<InitiateTransferInput> = {}): InitiateTra
   };
 }
 
-async function seedAccount(id: string, owner: string, balance: number): Promise<Account> {
+async function seedAccount(
+  id: string,
+  owner: string,
+  balance: number,
+): Promise<Account> {
   return accountGateway.save(new Account(id, owner, balance, 'ACTIVE'));
 }
 
@@ -41,7 +47,11 @@ describe('InitiateTransferUseCase', () => {
     accountGateway = new InMemoryAccountGateway();
     transferGateway = new InMemoryTransferGateway();
     unitOfWork = new InMemoryUnitOfWork(accountGateway, transferGateway);
-    useCase = new InitiateTransferUseCase(accountGateway, transferGateway, unitOfWork);
+    useCase = new InitiateTransferUseCase(
+      accountGateway,
+      transferGateway,
+      unitOfWork,
+    );
   });
 
   describe('successful transfer', () => {
@@ -53,8 +63,8 @@ describe('InitiateTransferUseCase', () => {
 
       const source = await accountGateway.findById(SOURCE_ID);
       const dest = await accountGateway.findById(DEST_ID);
-      expect(source!.balance).toBe(125);
-      expect(dest!.balance).toBe(175);
+      expect(source?.balance).toBe(125);
+      expect(dest?.balance).toBe(175);
     });
 
     it('returns output with id, source, destination, amount, timestamp, and COMPLETED status', async () => {
@@ -79,10 +89,10 @@ describe('InitiateTransferUseCase', () => {
 
       const persisted = await transferGateway.findById(output.id);
       expect(persisted).toBeDefined();
-      expect(persisted!.fromAccountId).toBe(SOURCE_ID);
-      expect(persisted!.toAccountId).toBe(DEST_ID);
-      expect(persisted!.amount).toBe(30);
-      expect(persisted!.status).toBe('COMPLETED');
+      expect(persisted?.fromAccountId).toBe(SOURCE_ID);
+      expect(persisted?.toAccountId).toBe(DEST_ID);
+      expect(persisted?.amount).toBe(30);
+      expect(persisted?.status).toBe('COMPLETED');
     });
   });
 
@@ -91,9 +101,9 @@ describe('InitiateTransferUseCase', () => {
       await seedAccount(SOURCE_ID, 'Alice', 30);
       await seedAccount(DEST_ID, 'Bob', 100);
 
-      await expect(
-        useCase.execute(buildInput({ amount: 50 })),
-      ).rejects.toThrow(InsufficientFundsError);
+      await expect(useCase.execute(buildInput({ amount: 50 }))).rejects.toThrow(
+        InsufficientFundsError,
+      );
     });
 
     it('does not change either account balance on rejection', async () => {
@@ -108,8 +118,8 @@ describe('InitiateTransferUseCase', () => {
 
       const source = await accountGateway.findById(SOURCE_ID);
       const dest = await accountGateway.findById(DEST_ID);
-      expect(source!.balance).toBe(30);
-      expect(dest!.balance).toBe(100);
+      expect(source?.balance).toBe(30);
+      expect(dest?.balance).toBe(100);
     });
 
     it('persists a transfer with FAILED status', async () => {
@@ -136,9 +146,9 @@ describe('InitiateTransferUseCase', () => {
       await seedAccount(SOURCE_ID, 'Alice', 200);
       await seedAccount(DEST_ID, 'Bob', 100);
 
-      await expect(
-        useCase.execute(buildInput({ amount: 0 })),
-      ).rejects.toThrow(InvalidAmountError);
+      await expect(useCase.execute(buildInput({ amount: 0 }))).rejects.toThrow(
+        InvalidAmountError,
+      );
     });
 
     it('rejects negative amount', async () => {
@@ -155,17 +165,17 @@ describe('InitiateTransferUseCase', () => {
     it('rejects when source account does not exist', async () => {
       await seedAccount(DEST_ID, 'Bob', 100);
 
-      await expect(
-        useCase.execute(buildInput()),
-      ).rejects.toThrow(AccountNotFoundError);
+      await expect(useCase.execute(buildInput())).rejects.toThrow(
+        AccountNotFoundError,
+      );
     });
 
     it('rejects when destination account does not exist', async () => {
       await seedAccount(SOURCE_ID, 'Alice', 200);
 
-      await expect(
-        useCase.execute(buildInput()),
-      ).rejects.toThrow(AccountNotFoundError);
+      await expect(useCase.execute(buildInput())).rejects.toThrow(
+        AccountNotFoundError,
+      );
     });
   });
 

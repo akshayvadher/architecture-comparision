@@ -1,5 +1,5 @@
-import { AccountRepository } from './account-repository.interface';
-import { TransferRepository } from './transfer-repository.interface';
+import type { AccountRepository } from './account-repository.interface';
+import type { TransferRepository } from './transfer-repository.interface';
 
 export const UNIT_OF_WORK = Symbol('UNIT_OF_WORK');
 

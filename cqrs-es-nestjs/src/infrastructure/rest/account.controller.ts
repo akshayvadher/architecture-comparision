@@ -1,9 +1,17 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
+import type { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateAccountCommand } from '../../commands/create-account.command';
 import { GetAccountQuery } from '../../queries/get-account.query';
-import { ListAccountsQuery } from '../../queries/list-accounts.query';
 import { GetAccountEventsQuery } from '../../queries/get-account-events.query';
+import { ListAccountsQuery } from '../../queries/list-accounts.query';
 
 @Controller('accounts')
 export class AccountController {

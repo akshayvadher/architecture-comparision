@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AccountService } from '../../src/application/account.service';
-import { InMemoryAccountRepository } from '../in-memory-account-repository';
 import {
   AccountNotFoundError,
   InvalidIdError,
 } from '../../src/domain/errors/domain-errors';
+import { InMemoryAccountRepository } from '../in-memory-account-repository';
 
 describe('Account Retrieval — Domain Tests (in-memory, no database)', () => {
   let accountService: AccountService;
@@ -38,9 +38,9 @@ describe('Account Retrieval — Domain Tests (in-memory, no database)', () => {
     });
 
     it('throws InvalidIdError for an invalid id format', async () => {
-      await expect(
-        accountService.getAccountById('not-a-uuid'),
-      ).rejects.toThrow(InvalidIdError);
+      await expect(accountService.getAccountById('not-a-uuid')).rejects.toThrow(
+        InvalidIdError,
+      );
     });
 
     it('throws InvalidIdError for an empty id', async () => {
@@ -93,15 +93,15 @@ describe('Account Retrieval — Domain Tests (in-memory, no database)', () => {
     it('AccountNotFoundError carries the missing id in its message', async () => {
       const missingId = '11111111-1111-1111-1111-111111111111';
 
-      await expect(
-        accountService.getAccountById(missingId),
-      ).rejects.toThrow(`Account with id ${missingId} not found`);
+      await expect(accountService.getAccountById(missingId)).rejects.toThrow(
+        `Account with id ${missingId} not found`,
+      );
     });
 
     it('InvalidIdError carries the bad id in its message', async () => {
-      await expect(
-        accountService.getAccountById('garbage'),
-      ).rejects.toThrow('Invalid id format: garbage');
+      await expect(accountService.getAccountById('garbage')).rejects.toThrow(
+        'Invalid id format: garbage',
+      );
     });
   });
 });

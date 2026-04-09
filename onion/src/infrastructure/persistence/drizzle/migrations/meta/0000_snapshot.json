@@ -90,12 +90,8 @@
           "name": "transfers_from_account_id_accounts_id_fk",
           "tableFrom": "transfers",
           "tableTo": "accounts",
-          "columnsFrom": [
-            "from_account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["from_account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -103,12 +99,8 @@
           "name": "transfers_to_account_id_accounts_id_fk",
           "tableFrom": "transfers",
           "tableTo": "accounts",
-          "columnsFrom": [
-            "to_account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["to_account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

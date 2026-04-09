@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { Account } from '../../../src/domain/aggregates/account';
+import {
+  InsufficientFundsError,
+  InvalidOwnerError,
+} from '../../../src/domain/errors/domain-errors';
 import { AccountId } from '../../../src/domain/value-objects/account-id';
 import { Money } from '../../../src/domain/value-objects/money';
-import {
-  InvalidOwnerError,
-  InsufficientFundsError,
-} from '../../../src/domain/errors/domain-errors';
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 

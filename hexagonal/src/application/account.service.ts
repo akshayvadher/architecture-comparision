@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Account, createAccount } from '../domain/models/account';
-import {
-  ACCOUNT_REPOSITORY,
-  AccountRepositoryPort,
-} from '../domain/ports/account-repository.port';
 import {
   AccountNotFoundError,
   InvalidIdError,
 } from '../domain/errors/domain-errors';
+import { type Account, createAccount } from '../domain/models/account';
+import {
+  ACCOUNT_REPOSITORY,
+  type AccountRepositoryPort,
+} from '../domain/ports/account-repository.port';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

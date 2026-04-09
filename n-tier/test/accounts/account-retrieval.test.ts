@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { Test } from '@nestjs/testing';
-import { AccountsService } from '../../src/accounts/accounts.service';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AccountsRepository } from '../../src/accounts/accounts.repository';
+import { AccountsService } from '../../src/accounts/accounts.service';
 import { DRIZZLE } from '../../src/database/drizzle.provider';
 import { db } from '../setup';
 
@@ -37,7 +37,9 @@ describe('Account Retrieval', () => {
 
       await expect(
         accountsService.getAccountById(nonExistentId),
-      ).rejects.toThrow('Account with id 00000000-0000-0000-0000-000000000000 not found');
+      ).rejects.toThrow(
+        'Account with id 00000000-0000-0000-0000-000000000000 not found',
+      );
     });
 
     it('throws error for an invalid id format', async () => {
@@ -47,9 +49,9 @@ describe('Account Retrieval', () => {
     });
 
     it('throws error for an empty id', async () => {
-      await expect(
-        accountsService.getAccountById(''),
-      ).rejects.toThrow('Invalid account id format');
+      await expect(accountsService.getAccountById('')).rejects.toThrow(
+        'Invalid account id format',
+      );
     });
   });
 

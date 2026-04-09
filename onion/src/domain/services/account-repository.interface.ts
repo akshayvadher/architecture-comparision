@@ -1,4 +1,4 @@
-import { Account } from '../model/account';
+import type { Account } from '../model/account';
 
 export const ACCOUNT_REPOSITORY = 'ACCOUNT_REPOSITORY';
 

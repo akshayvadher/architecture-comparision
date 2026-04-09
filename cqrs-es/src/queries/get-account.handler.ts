@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../infrastructure/persistence/database';
-import { accountReadModel } from '../infrastructure/persistence/schema';
 import {
   AccountNotFoundError,
   InvalidIdError,
 } from '../domain/errors/domain-errors';
+import {
+  DRIZZLE,
+  type DrizzleDB,
+} from '../infrastructure/persistence/database';
+import { accountReadModel } from '../infrastructure/persistence/schema';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

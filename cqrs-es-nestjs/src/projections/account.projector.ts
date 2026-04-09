@@ -1,8 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, sql, asc } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../infrastructure/persistence/database';
+import { asc, eq, sql } from 'drizzle-orm';
+import type { DomainEvent } from '../infrastructure/event-store/event-store';
+import {
+  DRIZZLE,
+  type DrizzleDB,
+} from '../infrastructure/persistence/database';
 import { accountReadModel, events } from '../infrastructure/persistence/schema';
-import { DomainEvent } from '../infrastructure/event-store/event-store';
 
 @Injectable()
 export class AccountProjector {

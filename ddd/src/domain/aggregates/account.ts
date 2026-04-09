@@ -1,7 +1,9 @@
-import { InsufficientFundsError } from '../errors/domain-errors';
-import { InvalidOwnerError } from '../errors/domain-errors';
-import { AccountId } from '../value-objects/account-id';
-import { Money } from '../value-objects/money';
+import {
+  InsufficientFundsError,
+  InvalidOwnerError,
+} from '../errors/domain-errors';
+import type { AccountId } from '../value-objects/account-id';
+import type { Money } from '../value-objects/money';
 
 export class Account {
   private _balance: Money;

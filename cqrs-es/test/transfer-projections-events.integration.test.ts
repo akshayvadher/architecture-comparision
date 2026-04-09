@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { AppModule } from '../src/infrastructure/app.module';
-import { db, TEST_DATABASE_URL } from './setup';
-import { transferReadModel } from '../src/infrastructure/persistence/schema';
 import { eq } from 'drizzle-orm';
+import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { AppModule } from '../src/infrastructure/app.module';
+import { transferReadModel } from '../src/infrastructure/persistence/schema';
+import { db, TEST_DATABASE_URL } from './setup';
 
 describe('Transfer Projections + Query Endpoint + Account Event Stream — Integration (HTTP + real DB)', () => {
   let app: INestApplication;
@@ -59,7 +59,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 1000);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 200);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      200,
+    );
     const transferId = transferResponse.body.id;
 
     const rows = await db
@@ -80,7 +84,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 50);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 200);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      200,
+    );
     const transferId = transferResponse.body.id;
 
     const rows = await db
@@ -104,7 +112,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 1000);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 300);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      300,
+    );
     const transferId = transferResponse.body.id;
 
     // Immediately query the transfer — projection should already be there
@@ -123,7 +135,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 1000);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 150);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      150,
+    );
     const transferId = transferResponse.body.id;
 
     const getResponse = await getTransfer(transferId);
@@ -140,7 +156,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 1000);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 250);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      250,
+    );
     const transferId = transferResponse.body.id;
 
     const getResponse = await getTransfer(transferId);
@@ -160,7 +180,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 1000);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 123);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      123,
+    );
     const transferId = transferResponse.body.id;
 
     const getResponse = await getTransfer(transferId);
@@ -207,7 +231,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 1000);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 200);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      200,
+    );
     const transferId = transferResponse.body.id;
 
     const getResponse = await getTransfer(transferId);
@@ -223,7 +251,11 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const source = await createAccount('Alice', 50);
     const destination = await createAccount('Bob', 500);
 
-    const transferResponse = await initiateTransfer(source.id, destination.id, 200);
+    const transferResponse = await initiateTransfer(
+      source.id,
+      destination.id,
+      200,
+    );
     const transferId = transferResponse.body.id;
 
     const getResponse = await getTransfer(transferId);

@@ -1,7 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { createAccount } from '../../src/domain/models/account';
-import { InvalidOwnerError, InvalidBalanceError } from '../../src/domain/errors/domain-errors';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AccountService } from '../../src/application/account.service';
+import {
+  InvalidBalanceError,
+  InvalidOwnerError,
+} from '../../src/domain/errors/domain-errors';
+import { createAccount } from '../../src/domain/models/account';
 import { InMemoryAccountRepository } from '../in-memory-account-repository';
 
 describe('Account Creation — Domain Tests (in-memory, no database)', () => {
@@ -33,15 +36,21 @@ describe('Account Creation — Domain Tests (in-memory, no database)', () => {
     });
 
     it('rejects a negative initial balance', () => {
-      expect(() => createAccount('some-id', 'Alice', -1)).toThrow(InvalidBalanceError);
+      expect(() => createAccount('some-id', 'Alice', -1)).toThrow(
+        InvalidBalanceError,
+      );
     });
 
     it('rejects an empty owner name', () => {
-      expect(() => createAccount('some-id', '', 100)).toThrow(InvalidOwnerError);
+      expect(() => createAccount('some-id', '', 100)).toThrow(
+        InvalidOwnerError,
+      );
     });
 
     it('rejects a whitespace-only owner name', () => {
-      expect(() => createAccount('some-id', '   ', 100)).toThrow(InvalidOwnerError);
+      expect(() => createAccount('some-id', '   ', 100)).toThrow(
+        InvalidOwnerError,
+      );
     });
   });
 

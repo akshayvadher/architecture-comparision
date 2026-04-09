@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { asc, eq } from 'drizzle-orm';
 import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/infrastructure/app.module';
-import { db, TEST_DATABASE_URL } from './setup';
 import {
   accountReadModel,
   events,
 } from '../src/infrastructure/persistence/schema';
-import { eq, and, asc } from 'drizzle-orm';
+import { db, TEST_DATABASE_URL } from './setup';
 
 describe('Transfer Command via CQRS/ES — Integration (HTTP + real DB)', () => {
   let app: INestApplication;
@@ -283,11 +283,7 @@ describe('Transfer Command via CQRS/ES — Integration (HTTP + real DB)', () => 
     const destination = await createAccount('Bob', 500);
     const nonExistentId = '00000000-0000-0000-0000-000000000000';
 
-    const response = await initiateTransfer(
-      nonExistentId,
-      destination.id,
-      100,
-    );
+    const response = await initiateTransfer(nonExistentId, destination.id, 100);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toBeDefined();
