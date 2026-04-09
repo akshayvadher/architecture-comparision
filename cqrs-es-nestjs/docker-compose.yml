@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cqrs_es_nestjs
+      POSTGRES_PASSWORD: cqrs_es_nestjs_local
+      POSTGRES_DB: cqrs_es_nestjs_bank
+    ports:
+      - "5439:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
