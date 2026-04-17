@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     root: './',
     setupFiles: ['./test/setup.ts'],
-    include: ['test/**/*.test.ts'],
+    include: ['test/**/*.integration.test.ts'],
     fileParallelism: false,
   },
   plugins: [swc.vite()],
