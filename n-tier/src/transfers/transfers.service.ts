@@ -5,9 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import type { AccountsRepository } from '../accounts/accounts.repository';
+import { AccountsRepository } from '../accounts/accounts.repository';
 import { DRIZZLE, type DrizzleDB } from '../database/drizzle.provider';
-import type { TransferRow, TransfersRepository } from './transfers.repository';
+import { TransfersRepository, type TransferRow } from './transfers.repository';
 
 export interface Transfer {
   id: string;

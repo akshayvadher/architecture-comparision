@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import type { AccountsRepository } from './accounts.repository';
+import { AccountsRepository } from './accounts.repository';
 
 export interface Account {
   id: string;
