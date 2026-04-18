@@ -104,7 +104,8 @@ describe('Account Projections + Query Endpoints via QueryBus -- Integration (HTT
         .get(`/accounts/${nonExistentId}`)
         .expect(404);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
   });
 
@@ -114,7 +115,8 @@ describe('Account Projections + Query Endpoints via QueryBus -- Integration (HTT
         .get('/accounts/not-a-uuid')
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('returns 400 for an empty id segment', async () => {
@@ -122,7 +124,8 @@ describe('Account Projections + Query Endpoints via QueryBus -- Integration (HTT
         .get('/accounts/123')
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
   });
 

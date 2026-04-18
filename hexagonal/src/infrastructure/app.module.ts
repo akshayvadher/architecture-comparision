@@ -66,6 +66,19 @@ import { validateEnv } from './config/env.validate';
               res.setHeader('x-request-id', id);
               return id;
             },
+            customLogLevel: (
+              _req: IncomingMessage,
+              res: ServerResponse,
+              err?: Error,
+            ) => {
+              if (res.statusCode >= 500 || err) {
+                return 'error';
+              }
+              if (res.statusCode >= 400) {
+                return 'warn';
+              }
+              return 'info';
+            },
             autoLogging: {
               ignore: (req: IncomingMessage) =>
                 req.url?.startsWith('/health') ?? false,

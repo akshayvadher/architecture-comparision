@@ -202,7 +202,8 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const response = await getTransfer(nonExistentId);
 
     expect(response.status).toBe(404);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   // =====================================================================
@@ -213,14 +214,16 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const response = await getTransfer('not-a-uuid');
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 when requesting a transfer with a numeric id instead of UUID', async () => {
     const response = await getTransfer('12345');
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   // =====================================================================
@@ -434,14 +437,16 @@ describe('Transfer Projections + Query Endpoint + Account Event Stream — Integ
     const response = await getAccountEvents(nonExistentId);
 
     expect(response.status).toBe(404);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 when requesting event stream with an invalid id format', async () => {
     const response = await getAccountEvents('not-a-uuid');
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   // =====================================================================

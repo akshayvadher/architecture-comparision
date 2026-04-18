@@ -3,10 +3,15 @@ import {
   Catch,
   type ExceptionFilter,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ZodValidationException } from 'nestjs-zod';
 
 type ZodIssue = { path: (string | number)[]; message: string };
+
+type ErrorBody = {
+  error: { code: string; message: string; requestId: string | undefined };
+};
 
 function flattenZodIssues(exception: ZodValidationException): string {
   const zodError = exception.getZodError() as { issues?: ZodIssue[] } | null;
@@ -35,15 +40,65 @@ function extractHttpMessage(exception: HttpException): string {
   return message ?? exception.message;
 }
 
-@Catch(HttpException)
+function resolveRequestId(req: unknown, res: unknown): string | undefined {
+  const reqId = (req as { id?: unknown } | null)?.id;
+  if (typeof reqId === 'string') {
+    return reqId;
+  }
+  const getHeader = (res as { getHeader?: (name: string) => unknown } | null)
+    ?.getHeader;
+  if (typeof getHeader === 'function') {
+    const header = getHeader.call(res, 'x-request-id');
+    if (typeof header === 'string') {
+      return header;
+    }
+  }
+  return undefined;
+}
+
+function buildBody(
+  code: string,
+  message: string,
+  requestId: string | undefined,
+): ErrorBody {
+  return { error: { code, message, requestId } };
+}
+
+@Catch()
 export class HttpErrorFilter implements ExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost): void {
+  catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse();
-    const status = exception.getStatus();
-    const message =
-      exception instanceof ZodValidationException
-        ? flattenZodIssues(exception)
-        : extractHttpMessage(exception);
-    response.status(status).json({ statusCode: status, message });
+    const request = host.switchToHttp().getRequest();
+    const requestId = resolveRequestId(request, response);
+
+    if (exception instanceof ZodValidationException) {
+      const status = exception.getStatus();
+      response
+        .status(status)
+        .json(
+          buildBody('ValidationError', flattenZodIssues(exception), requestId),
+        );
+      return;
+    }
+
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+      response
+        .status(status)
+        .json(
+          buildBody(
+            exception.constructor.name,
+            extractHttpMessage(exception),
+            requestId,
+          ),
+        );
+      return;
+    }
+
+    response
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json(
+        buildBody('InternalServerError', 'Internal server error', requestId),
+      );
   }
 }

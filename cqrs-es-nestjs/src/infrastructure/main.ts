@@ -40,4 +40,32 @@ async function bootstrap() {
   await app.listen(port);
 }
 
+process.on('unhandledRejection', (reason: unknown) => {
+  const payload =
+    reason instanceof Error
+      ? {
+          err: {
+            name: reason.name,
+            message: reason.message,
+            stack: reason.stack,
+          },
+        }
+      : { reason };
+  console.error(
+    JSON.stringify({ level: 'fatal', msg: 'unhandledRejection', ...payload }),
+  );
+  process.exit(1);
+});
+
+process.on('uncaughtException', (err: Error) => {
+  console.error(
+    JSON.stringify({
+      level: 'fatal',
+      msg: 'uncaughtException',
+      err: { name: err.name, message: err.message, stack: err.stack },
+    }),
+  );
+  process.exit(1);
+});
+
 bootstrap();

@@ -129,7 +129,7 @@ describe('Transfer Projections + Query Endpoints + Event Stream -- Integration (
         .get(`/transfers/${nonExistentId}`)
         .expect(404);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
     });
   });
 
@@ -139,7 +139,7 @@ describe('Transfer Projections + Query Endpoints + Event Stream -- Integration (
         .get('/transfers/not-a-uuid')
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
     });
 
     it('returns 400 for a short numeric id', async () => {
@@ -147,7 +147,7 @@ describe('Transfer Projections + Query Endpoints + Event Stream -- Integration (
         .get('/transfers/123')
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
     });
   });
 
@@ -314,7 +314,7 @@ describe('Transfer Projections + Query Endpoints + Event Stream -- Integration (
         .get(`/accounts/${nonExistentId}/events`)
         .expect(404);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
     });
 
     it('returns 400 for an invalid account id format on the events endpoint', async () => {
@@ -322,7 +322,7 @@ describe('Transfer Projections + Query Endpoints + Event Stream -- Integration (
         .get('/accounts/not-a-uuid/events')
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
     });
   });
 

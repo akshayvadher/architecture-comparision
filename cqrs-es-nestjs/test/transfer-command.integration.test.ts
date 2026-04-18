@@ -275,7 +275,8 @@ describe('Transfer Command + Business Rules via CommandBus -- Integration (HTTP 
         })
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('rejects negative amount with 400 status', async () => {
@@ -291,7 +292,8 @@ describe('Transfer Command + Business Rules via CommandBus -- Integration (HTTP 
         })
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
   });
 
@@ -309,7 +311,8 @@ describe('Transfer Command + Business Rules via CommandBus -- Integration (HTTP 
         })
         .expect(404);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('returns 404 when destination account does not exist', async () => {
@@ -325,7 +328,8 @@ describe('Transfer Command + Business Rules via CommandBus -- Integration (HTTP 
         })
         .expect(404);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
   });
 

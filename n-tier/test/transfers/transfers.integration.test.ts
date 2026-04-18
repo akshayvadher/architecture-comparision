@@ -102,7 +102,8 @@ describe('POST /transfers (integration)', () => {
       })
       .expect(400);
 
-    expect(response.body.message).toContain('Insufficient funds');
+    expect(response.body.error.message).toContain('Insufficient funds');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('does not change balances when transfer is rejected for insufficient funds', async () => {
@@ -144,7 +145,8 @@ describe('POST /transfers (integration)', () => {
       })
       .expect(400);
 
-    expect(response.body.message).toContain('greater than zero');
+    expect(response.body.error.message).toContain('greater than zero');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 when transfer amount is negative', async () => {
@@ -161,7 +163,8 @@ describe('POST /transfers (integration)', () => {
       })
       .expect(400);
 
-    expect(response.body.message).toContain('greater than zero');
+    expect(response.body.error.message).toContain('greater than zero');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 404 when source account does not exist', async () => {
@@ -177,7 +180,8 @@ describe('POST /transfers (integration)', () => {
       })
       .expect(404);
 
-    expect(response.body.message).toContain('Source account');
+    expect(response.body.error.message).toContain('Source account');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 404 when destination account does not exist', async () => {
@@ -193,7 +197,8 @@ describe('POST /transfers (integration)', () => {
       })
       .expect(404);
 
-    expect(response.body.message).toContain('Destination account');
+    expect(response.body.error.message).toContain('Destination account');
+    expect(response.body.error.code).toBeDefined();
   });
 });
 
@@ -273,7 +278,8 @@ describe('GET /transfers/:id (integration)', () => {
       .get('/transfers/00000000-0000-0000-0000-000000000000')
       .expect(404);
 
-    expect(response.body.message).toContain('not found');
+    expect(response.body.error.message).toContain('not found');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 for an invalid transfer id format', async () => {
@@ -283,6 +289,7 @@ describe('GET /transfers/:id (integration)', () => {
       .get('/transfers/not-a-uuid')
       .expect(400);
 
-    expect(response.body.message).toContain('Invalid transfer id format');
+    expect(response.body.error.message).toContain('Invalid transfer id format');
+    expect(response.body.error.code).toBeDefined();
   });
 });

@@ -49,7 +49,8 @@ describe('POST /accounts — integration', () => {
       .send({ owner: 'Alice', balance: -50 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/negative/i);
+    expect(response.body.error.message).toMatch(/negative/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects missing owner with 400', async () => {
@@ -58,7 +59,11 @@ describe('POST /accounts — integration', () => {
       .send({ balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/owner/i);
+    expect(response.body.error.message).toMatch(/owner/i);
+    expect(response.body.error.code).toBeDefined();
+    expect(response.body.error.requestId).toMatch(
+      /^[0-9a-f-]{36}$/i,
+    );
   });
 
   it('rejects empty owner string with 400', async () => {
@@ -67,7 +72,8 @@ describe('POST /accounts — integration', () => {
       .send({ owner: '', balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/owner/i);
+    expect(response.body.error.message).toMatch(/owner/i);
+    expect(response.body.error.code).toBeDefined();
   });
 });
 
@@ -99,7 +105,8 @@ describe('GET /accounts/:id — integration', () => {
       .get(`/accounts/${nonExistentId}`)
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 for an invalid id format', async () => {
@@ -107,7 +114,8 @@ describe('GET /accounts/:id — integration', () => {
       .get('/accounts/not-a-uuid')
       .expect(400);
 
-    expect(response.body.message).toMatch(/invalid id/i);
+    expect(response.body.error.message).toMatch(/invalid id/i);
+    expect(response.body.error.code).toBeDefined();
   });
 });
 

@@ -62,7 +62,8 @@ describe('POST /accounts — integration', () => {
       .send({ owner: 'Alice', balance: -50 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/negative/i);
+    expect(response.body.error.message).toMatch(/negative/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects missing owner with 400', async () => {
@@ -71,7 +72,9 @@ describe('POST /accounts — integration', () => {
       .send({ balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/owner/i);
+    expect(response.body.error.message).toMatch(/owner/i);
+    expect(response.body.error.code).toBeDefined();
+    expect(response.body.error.requestId).toMatch(/^[0-9a-f-]{36}$/i);
   });
 
   it('rejects empty owner string with 400', async () => {
@@ -80,7 +83,8 @@ describe('POST /accounts — integration', () => {
       .send({ owner: '', balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/owner/i);
+    expect(response.body.error.message).toMatch(/owner/i);
+    expect(response.body.error.code).toBeDefined();
   });
 });
 
@@ -108,7 +112,8 @@ describe('GET /accounts/:id — integration', () => {
       .get('/accounts/00000000-0000-0000-0000-000000000000')
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 for an invalid id format', async () => {
@@ -116,7 +121,8 @@ describe('GET /accounts/:id — integration', () => {
       .get('/accounts/not-a-uuid')
       .expect(400);
 
-    expect(response.body.message).toMatch(/invalid id/i);
+    expect(response.body.error.message).toMatch(/invalid id/i);
+    expect(response.body.error.code).toBeDefined();
   });
 });
 
@@ -157,14 +163,14 @@ describe('GET /accounts — integration', () => {
       .get('/accounts/00000000-0000-0000-0000-000000000000')
       .expect(404);
 
-    expect(notFoundResponse.body).toHaveProperty('statusCode', 404);
-    expect(notFoundResponse.body).toHaveProperty('message');
+    expect(notFoundResponse.body.error.code).toBe('AccountNotFoundError');
+    expect(notFoundResponse.body.error.message).toBeDefined();
 
     const badIdResponse = await request(app.getHttpServer())
       .get('/accounts/invalid-format')
       .expect(400);
 
-    expect(badIdResponse.body).toHaveProperty('statusCode', 400);
-    expect(badIdResponse.body).toHaveProperty('message');
+    expect(badIdResponse.body.error.code).toBe('InvalidIdError');
+    expect(badIdResponse.body.error.message).toBeDefined();
   });
 });

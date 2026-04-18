@@ -56,7 +56,8 @@ describe('Account Creation — Integration Tests (HTTP + real DB)', () => {
       .send({ owner: 'Alice', balance: -100 })
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects a missing owner name with an error response', async () => {
@@ -65,7 +66,9 @@ describe('Account Creation — Integration Tests (HTTP + real DB)', () => {
       .send({ balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
+    expect(response.body.error.requestId).toMatch(/^[0-9a-f-]{36}$/i);
   });
 
   it('rejects an empty owner name with an error response', async () => {
@@ -74,7 +77,8 @@ describe('Account Creation — Integration Tests (HTTP + real DB)', () => {
       .send({ owner: '', balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 });
 
@@ -120,7 +124,8 @@ describe('Account Retrieval — Integration Tests (HTTP + real DB)', () => {
         .get('/accounts/00000000-0000-0000-0000-000000000000')
         .expect(404);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('returns 400 for an invalid id format', async () => {
@@ -128,7 +133,8 @@ describe('Account Retrieval — Integration Tests (HTTP + real DB)', () => {
         .get('/accounts/not-a-uuid')
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
   });
 
@@ -177,8 +183,8 @@ describe('Account Retrieval — Integration Tests (HTTP + real DB)', () => {
         .get('/accounts/00000000-0000-0000-0000-999999999999')
         .expect(404);
 
-      expect(response.body.statusCode).toBe(404);
-      expect(response.body.message).toContain('not found');
+      expect(response.body.error.code).toBe('AccountNotFoundError');
+      expect(response.body.error.message).toContain('not found');
     });
 
     it('maps InvalidIdError to 400', async () => {
@@ -186,8 +192,8 @@ describe('Account Retrieval — Integration Tests (HTTP + real DB)', () => {
         .get('/accounts/bad-id')
         .expect(400);
 
-      expect(response.body.statusCode).toBe(400);
-      expect(response.body.message).toContain('Invalid id format');
+      expect(response.body.error.code).toBe('InvalidIdError');
+      expect(response.body.error.message).toContain('Invalid id format');
     });
   });
 });

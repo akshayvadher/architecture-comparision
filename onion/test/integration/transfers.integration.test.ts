@@ -85,7 +85,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: alice.id, toAccountId: bob.id, amount: 100 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/insufficient funds/i);
+    expect(response.body.error.message).toMatch(/insufficient funds/i);
+    expect(response.body.error.code).toBeDefined();
 
     const aliceAfter = await request(app.getHttpServer())
       .get(`/accounts/${alice.id}`)
@@ -107,7 +108,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: alice.id, toAccountId: bob.id, amount: 0 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/greater than zero/i);
+    expect(response.body.error.message).toMatch(/greater than zero/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects negative amount with 400', async () => {
@@ -119,7 +121,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: alice.id, toAccountId: bob.id, amount: -50 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/greater than zero/i);
+    expect(response.body.error.message).toMatch(/greater than zero/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 404 when source account does not exist', async () => {
@@ -134,7 +137,8 @@ describe('POST /transfers — integration', () => {
       })
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 404 when destination account does not exist', async () => {
@@ -149,7 +153,8 @@ describe('POST /transfers — integration', () => {
       })
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('transfer is atomic — multiple sequential transfers maintain correct balances', async () => {
@@ -207,7 +212,8 @@ describe('GET /transfers/:id — integration', () => {
       .get('/transfers/00000000-0000-0000-0000-000000000000')
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 for an invalid transfer id format', async () => {
@@ -215,6 +221,7 @@ describe('GET /transfers/:id — integration', () => {
       .get('/transfers/not-a-uuid')
       .expect(400);
 
-    expect(response.body.message).toMatch(/invalid id/i);
+    expect(response.body.error.message).toMatch(/invalid id/i);
+    expect(response.body.error.code).toBeDefined();
   });
 });

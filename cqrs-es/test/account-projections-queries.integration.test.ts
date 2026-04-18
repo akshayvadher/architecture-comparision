@@ -123,7 +123,8 @@ describe('Account Projections and Queries — Integration (HTTP + real DB)', () 
       .get(`/accounts/${nonExistentId}`)
       .expect(404);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   // --- AC 6: Invalid id format returns error ---
@@ -133,7 +134,8 @@ describe('Account Projections and Queries — Integration (HTTP + real DB)', () 
       .get('/accounts/not-a-uuid')
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 for a numeric id instead of UUID', async () => {
@@ -141,7 +143,8 @@ describe('Account Projections and Queries — Integration (HTTP + real DB)', () 
       .get('/accounts/12345')
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   // --- AC 7: List all accounts via GET /accounts ---

@@ -57,7 +57,8 @@ describe('Account Creation via CQRS/ES (@nestjs/cqrs) -- Integration (HTTP + rea
       .send({ owner: 'Alice', balance: -100 })
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects a missing owner name with 400 status', async () => {
@@ -66,7 +67,9 @@ describe('Account Creation via CQRS/ES (@nestjs/cqrs) -- Integration (HTTP + rea
       .send({ balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
+    expect(response.body.error.requestId).toMatch(/^[0-9a-f-]{36}$/i);
   });
 
   it('rejects an empty owner name with 400 status', async () => {
@@ -75,7 +78,8 @@ describe('Account Creation via CQRS/ES (@nestjs/cqrs) -- Integration (HTTP + rea
       .send({ owner: '', balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('stores exactly one AccountCreated event in the event store after creating an account', async () => {

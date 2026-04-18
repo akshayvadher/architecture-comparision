@@ -47,7 +47,9 @@ describe('POST /accounts (integration)', () => {
       .send({ balance: 100 })
       .expect(400);
 
-    expect(response.body.message).toContain('Owner name is required');
+    expect(response.body.error.message).toContain('Owner name is required');
+    expect(response.body.error.code).toBeDefined();
+    expect(response.body.error.requestId).toMatch(/^[0-9a-f-]{36}$/i);
   });
 
   it('returns 400 when initial balance is negative', async () => {
@@ -56,9 +58,10 @@ describe('POST /accounts (integration)', () => {
       .send({ owner: 'Bob', balance: -50 })
       .expect(400);
 
-    expect(response.body.message).toContain(
+    expect(response.body.error.message).toContain(
       'Initial balance cannot be negative',
     );
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('persists the account across requests', async () => {
@@ -127,7 +130,8 @@ describe('GET /accounts/:id (integration)', () => {
       .get('/accounts/00000000-0000-0000-0000-000000000000')
       .expect(404);
 
-    expect(response.body.message).toContain('not found');
+    expect(response.body.error.message).toContain('not found');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 for an invalid id format', async () => {
@@ -135,7 +139,8 @@ describe('GET /accounts/:id (integration)', () => {
       .get('/accounts/not-a-uuid')
       .expect(400);
 
-    expect(response.body.message).toContain('Invalid account id format');
+    expect(response.body.error.message).toContain('Invalid account id format');
+    expect(response.body.error.code).toBeDefined();
   });
 });
 

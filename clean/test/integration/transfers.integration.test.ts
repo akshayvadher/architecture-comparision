@@ -85,7 +85,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: sourceId, toAccountId: destId, amount: 100 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/insufficient/i);
+    expect(response.body.error.message).toMatch(/insufficient/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('does not change either balance when transfer is rejected for insufficient funds', async () => {
@@ -112,7 +113,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: sourceId, toAccountId: destId, amount: 0 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/greater than zero/i);
+    expect(response.body.error.message).toMatch(/greater than zero/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects negative amount with error', async () => {
@@ -124,7 +126,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: sourceId, toAccountId: destId, amount: -10 })
       .expect(400);
 
-    expect(response.body.message).toMatch(/greater than zero/i);
+    expect(response.body.error.message).toMatch(/greater than zero/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns not-found when source account does not exist', async () => {
@@ -136,7 +139,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: fakeSourceId, toAccountId: destId, amount: 50 })
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns not-found when destination account does not exist', async () => {
@@ -148,7 +152,8 @@ describe('POST /transfers — integration', () => {
       .send({ fromAccountId: sourceId, toAccountId: fakeDestId, amount: 50 })
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('is atomic — balances unchanged after a mid-transfer failure', async () => {
@@ -212,7 +217,8 @@ describe('GET /transfers/:id — integration', () => {
       .get(`/transfers/${nonExistentId}`)
       .expect(404);
 
-    expect(response.body.message).toMatch(/not found/i);
+    expect(response.body.error.message).toMatch(/not found/i);
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns an error for an invalid id format', async () => {
@@ -220,6 +226,7 @@ describe('GET /transfers/:id — integration', () => {
       .get('/transfers/not-a-uuid')
       .expect(400);
 
-    expect(response.body.message).toMatch(/invalid id/i);
+    expect(response.body.error.message).toMatch(/invalid id/i);
+    expect(response.body.error.code).toBeDefined();
   });
 });

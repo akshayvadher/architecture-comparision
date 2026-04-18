@@ -95,7 +95,8 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .send({ fromAccountId: sourceId, toAccountId: destId, amount: 500 })
         .expect(400);
 
-      expect(response.body.message).toContain('Insufficient funds');
+      expect(response.body.error.message).toContain('Insufficient funds');
+      expect(response.body.error.code).toBeDefined();
 
       // Verify neither balance changed
       const sourceResponse = await request(app.getHttpServer())
@@ -120,7 +121,8 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .send({ fromAccountId: sourceId, toAccountId: destId, amount: -50 })
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('rejects a zero transfer amount with 400', async () => {
@@ -132,7 +134,8 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .send({ fromAccountId: sourceId, toAccountId: destId, amount: 0 })
         .expect(400);
 
-      expect(response.body.message).toBeDefined();
+      expect(response.body.error.message).toBeDefined();
+      expect(response.body.error.code).toBeDefined();
     });
   });
 
@@ -146,7 +149,8 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .send({ fromAccountId: fakeId, toAccountId: destId, amount: 100 })
         .expect(404);
 
-      expect(response.body.message).toContain('not found');
+      expect(response.body.error.message).toContain('not found');
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('returns 404 when destination account does not exist', async () => {
@@ -158,7 +162,8 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .send({ fromAccountId: sourceId, toAccountId: fakeId, amount: 100 })
         .expect(404);
 
-      expect(response.body.message).toContain('not found');
+      expect(response.body.error.message).toContain('not found');
+      expect(response.body.error.code).toBeDefined();
     });
   });
 
@@ -201,7 +206,8 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .get(`/transfers/${fakeId}`)
         .expect(404);
 
-      expect(response.body.message).toContain('not found');
+      expect(response.body.error.message).toContain('not found');
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('returns 400 for an invalid transfer id format', async () => {
@@ -209,7 +215,8 @@ describe('Money Transfer — Integration Tests (HTTP + real DB)', () => {
         .get('/transfers/not-a-uuid')
         .expect(400);
 
-      expect(response.body.message).toContain('Invalid id');
+      expect(response.body.error.message).toContain('Invalid id');
+      expect(response.body.error.code).toBeDefined();
     });
 
     it('retrieved transfer data matches what was returned at creation time', async () => {

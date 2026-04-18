@@ -248,7 +248,8 @@ describe('Transfer Command via CQRS/ES — Integration (HTTP + real DB)', () => 
     const response = await initiateTransfer(source.id, destination.id, 0);
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects a transfer with a negative amount', async () => {
@@ -258,7 +259,8 @@ describe('Transfer Command via CQRS/ES — Integration (HTTP + real DB)', () => 
     const response = await initiateTransfer(source.id, destination.id, -50);
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('does not append any events when a transfer with invalid amount is rejected', async () => {
@@ -286,7 +288,8 @@ describe('Transfer Command via CQRS/ES — Integration (HTTP + real DB)', () => 
     const response = await initiateTransfer(nonExistentId, destination.id, 100);
 
     expect(response.status).toBe(404);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   // --- AC 8: Transferring to a non-existent account returns not-found ---
@@ -298,7 +301,8 @@ describe('Transfer Command via CQRS/ES — Integration (HTTP + real DB)', () => 
     const response = await initiateTransfer(source.id, nonExistentId, 100);
 
     expect(response.status).toBe(404);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.error.message).toBeDefined();
+    expect(response.body.error.code).toBeDefined();
   });
 
   // --- AC 9: Transfer is atomic — all events appended in one transaction ---

@@ -79,7 +79,8 @@ describe('Transfer Execution — Integration Tests (HTTP + real DB)', () => {
       .send({ fromAccountId: alice.id, toAccountId: bob.id, amount: 100 })
       .expect(400);
 
-    expect(response.body.message).toContain('Insufficient funds');
+    expect(response.body.error.message).toContain('Insufficient funds');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('does not change balances when transfer is rejected for insufficient funds', async () => {
@@ -111,7 +112,8 @@ describe('Transfer Execution — Integration Tests (HTTP + real DB)', () => {
       .send({ fromAccountId: alice.id, toAccountId: bob.id, amount: 0 })
       .expect(400);
 
-    expect(response.body.message).toContain('greater than zero');
+    expect(response.body.error.message).toContain('greater than zero');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('rejects negative amount transfer', async () => {
@@ -123,7 +125,8 @@ describe('Transfer Execution — Integration Tests (HTTP + real DB)', () => {
       .send({ fromAccountId: alice.id, toAccountId: bob.id, amount: -50 })
       .expect(400);
 
-    expect(response.body.message).toContain('greater than zero');
+    expect(response.body.error.message).toContain('greater than zero');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns not-found when source account does not exist', async () => {
@@ -138,7 +141,8 @@ describe('Transfer Execution — Integration Tests (HTTP + real DB)', () => {
       })
       .expect(404);
 
-    expect(response.body.message).toContain('not found');
+    expect(response.body.error.message).toContain('not found');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns not-found when destination account does not exist', async () => {
@@ -153,7 +157,8 @@ describe('Transfer Execution — Integration Tests (HTTP + real DB)', () => {
       })
       .expect(404);
 
-    expect(response.body.message).toContain('not found');
+    expect(response.body.error.message).toContain('not found');
+    expect(response.body.error.code).toBeDefined();
   });
 });
 
@@ -229,8 +234,9 @@ describe('Transfer Retrieval — Integration Tests (HTTP + real DB)', () => {
       .get('/transfers/99999999-9999-9999-9999-999999999999')
       .expect(404);
 
-    expect(response.body.message).toContain('Transfer with id');
-    expect(response.body.message).toContain('not found');
+    expect(response.body.error.message).toContain('Transfer with id');
+    expect(response.body.error.message).toContain('not found');
+    expect(response.body.error.code).toBeDefined();
   });
 
   it('returns 400 for an invalid transfer id format', async () => {
@@ -238,6 +244,7 @@ describe('Transfer Retrieval — Integration Tests (HTTP + real DB)', () => {
       .get('/transfers/not-a-valid-uuid')
       .expect(400);
 
-    expect(response.body.message).toContain('Invalid id format');
+    expect(response.body.error.message).toContain('Invalid id format');
+    expect(response.body.error.code).toBeDefined();
   });
 });

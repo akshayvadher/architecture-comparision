@@ -20,6 +20,10 @@ const DOMAIN_ERROR_STATUS_MAP = new Map<string, number>([
 
 type ZodIssue = { path: (string | number)[]; message: string };
 
+type ErrorBody = {
+  error: { code: string; message: string; requestId: string | undefined };
+};
+
 function flattenZodIssues(exception: ZodValidationException): string {
   const zodError = exception.getZodError() as { issues?: ZodIssue[] } | null;
   const issues = zodError?.issues ?? [];
@@ -47,41 +51,75 @@ function extractHttpMessage(exception: HttpException): string {
   return message ?? exception.message;
 }
 
+function resolveRequestId(req: unknown, res: unknown): string | undefined {
+  const reqId = (req as { id?: unknown } | null)?.id;
+  if (typeof reqId === 'string') {
+    return reqId;
+  }
+  const getHeader = (res as { getHeader?: (name: string) => unknown } | null)
+    ?.getHeader;
+  if (typeof getHeader === 'function') {
+    const header = getHeader.call(res, 'x-request-id');
+    if (typeof header === 'string') {
+      return header;
+    }
+  }
+  return undefined;
+}
+
+function buildBody(
+  code: string,
+  message: string,
+  requestId: string | undefined,
+): ErrorBody {
+  return { error: { code, message, requestId } };
+}
+
 @Catch()
 export class DomainErrorFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse();
+    const request = host.switchToHttp().getRequest();
+    const requestId = resolveRequestId(request, response);
 
     if (exception instanceof ZodValidationException) {
-      response.status(exception.getStatus()).json({
-        statusCode: exception.getStatus(),
-        message: flattenZodIssues(exception),
-      });
+      const status = exception.getStatus();
+      response
+        .status(status)
+        .json(
+          buildBody('ValidationError', flattenZodIssues(exception), requestId),
+        );
       return;
     }
 
     if (exception instanceof HttpException) {
-      response.status(exception.getStatus()).json({
-        statusCode: exception.getStatus(),
-        message: extractHttpMessage(exception),
-      });
+      const status = exception.getStatus();
+      response
+        .status(status)
+        .json(
+          buildBody(
+            exception.constructor.name,
+            extractHttpMessage(exception),
+            requestId,
+          ),
+        );
       return;
     }
 
-    if (!(exception instanceof Error)) {
-      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Internal server error',
-      });
-      return;
+    if (exception instanceof Error) {
+      const mapped = DOMAIN_ERROR_STATUS_MAP.get(exception.name);
+      if (mapped != null) {
+        response
+          .status(mapped)
+          .json(buildBody(exception.name, exception.message, requestId));
+        return;
+      }
     }
 
-    const statusCode =
-      DOMAIN_ERROR_STATUS_MAP.get(exception.name) ??
-      HttpStatus.INTERNAL_SERVER_ERROR;
-    response.status(statusCode).json({
-      statusCode,
-      message: exception.message,
-    });
+    response
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json(
+        buildBody('InternalServerError', 'Internal server error', requestId),
+      );
   }
 }
