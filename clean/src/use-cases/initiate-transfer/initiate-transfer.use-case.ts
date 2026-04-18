@@ -55,20 +55,23 @@ export class InitiateTransferUseCase {
         const sourceAccount = await accountGateway.findById(
           input.fromAccountId,
         );
+        if (!sourceAccount) {
+          throw new AccountNotFoundError(input.fromAccountId);
+        }
         const destinationAccount = await accountGateway.findById(
           input.toAccountId,
         );
+        if (!destinationAccount) {
+          throw new AccountNotFoundError(input.toAccountId);
+        }
 
-        sourceAccount?.debit(input.amount);
-        destinationAccount?.credit(input.amount);
+        sourceAccount.debit(input.amount);
+        destinationAccount.credit(input.amount);
 
+        await accountGateway.updateBalance(sourceAccount.id, sourceAccount.balance);
         await accountGateway.updateBalance(
-          sourceAccount?.id,
-          sourceAccount?.balance,
-        );
-        await accountGateway.updateBalance(
-          destinationAccount?.id,
-          destinationAccount?.balance,
+          destinationAccount.id,
+          destinationAccount.balance,
         );
 
         const transfer = await transferGateway.save(

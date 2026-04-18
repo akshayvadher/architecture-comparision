@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Transfer } from '../../../src/domain/aggregates/transfer';
+import type { DomainEvent } from '../../../src/domain/events/domain-event';
 import { AccountId } from '../../../src/domain/value-objects/account-id';
 import { Money } from '../../../src/domain/value-objects/money';
 import { TransferId } from '../../../src/domain/value-objects/transfer-id';
@@ -122,7 +123,7 @@ describe('Transfer aggregate — domain event production', () => {
         timestamp,
       );
 
-      const events = transfer.domainEvents;
+      const events = transfer.domainEvents as DomainEvent[];
       events.pop();
 
       expect(transfer.domainEvents).toHaveLength(1);

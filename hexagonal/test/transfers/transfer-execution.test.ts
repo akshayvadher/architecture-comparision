@@ -6,6 +6,7 @@ import {
   InvalidAmountError,
 } from '../../src/domain/errors/domain-errors';
 import type { Account } from '../../src/domain/models/account';
+import type { Transfer } from '../../src/domain/models/transfer';
 import { InMemoryAccountRepository } from '../in-memory-account-repository';
 import { InMemoryTransferRepository } from '../in-memory-transfer-repository';
 import { InMemoryUnitOfWork } from '../in-memory-unit-of-work';
@@ -121,7 +122,9 @@ describe('Transfer Execution — Domain Tests (in-memory, no database)', () => {
         // expected
       }
 
-      const allTransfers = Array.from((transferRepo as any).transfers.values());
+      const allTransfers: Transfer[] = Array.from(
+        (transferRepo as unknown as { transfers: Map<string, Transfer> }).transfers.values(),
+      );
       expect(allTransfers).toHaveLength(1);
       expect(allTransfers[0].status).toBe('FAILED');
     });

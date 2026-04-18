@@ -78,7 +78,7 @@ describe('POST /accounts (integration)', () => {
 
     expect(found).toBeDefined();
     expect(found?.owner).toBe('Charlie');
-    expect(parseFloat(found?.balance)).toBe(500);
+    expect(parseFloat(found?.balance ?? '')).toBe(500);
     expect(found?.status).toBe('ACTIVE');
   });
 });
