@@ -123,7 +123,9 @@ describe('Transfer Execution — Domain Tests (in-memory, no database)', () => {
       }
 
       const allTransfers: Transfer[] = Array.from(
-        (transferRepo as unknown as { transfers: Map<string, Transfer> }).transfers.values(),
+        (
+          transferRepo as unknown as { transfers: Map<string, Transfer> }
+        ).transfers.values(),
       );
       expect(allTransfers).toHaveLength(1);
       expect(allTransfers[0].status).toBe('FAILED');

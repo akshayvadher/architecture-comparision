@@ -8,6 +8,7 @@ import { DomainErrorFilter } from '../../src/interface-adapters/error-filter';
 process.env.DATABASE_URL =
   process.env.DATABASE_URL ||
   'postgresql://clean:clean_local@localhost:5435/clean_bank_test';
+process.env.THROTTLE_LIMIT = process.env.THROTTLE_LIMIT || '10000';
 
 let app: INestApplication;
 

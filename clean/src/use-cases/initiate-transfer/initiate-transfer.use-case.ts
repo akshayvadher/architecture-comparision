@@ -68,7 +68,10 @@ export class InitiateTransferUseCase {
         sourceAccount.debit(input.amount);
         destinationAccount.credit(input.amount);
 
-        await accountGateway.updateBalance(sourceAccount.id, sourceAccount.balance);
+        await accountGateway.updateBalance(
+          sourceAccount.id,
+          sourceAccount.balance,
+        );
         await accountGateway.updateBalance(
           destinationAccount.id,
           destinationAccount.balance,

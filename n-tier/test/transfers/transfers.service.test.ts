@@ -230,9 +230,7 @@ describe('TransfersService — unit (repositories and db mocked)', () => {
           balance: '100',
           status: 'ACTIVE',
         });
-      transfersRepo.insertWithDefaultDb.mockImplementation(
-        async (row) => row,
-      );
+      transfersRepo.insertWithDefaultDb.mockImplementation(async (row) => row);
     });
 
     it('throws BadRequestException, records a FAILED transfer, and does not update balances', async () => {

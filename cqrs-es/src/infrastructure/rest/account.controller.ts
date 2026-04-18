@@ -11,6 +11,7 @@ import { CreateAccountHandler } from '../../commands/create-account.handler';
 import { GetAccountHandler } from '../../queries/get-account.handler';
 import { GetAccountEventsHandler } from '../../queries/get-account-events.handler';
 import { ListAccountsHandler } from '../../queries/list-accounts.handler';
+import { CreateAccountDto } from './dto/create-account.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -23,7 +24,7 @@ export class AccountController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() body: { owner: string; balance: number }) {
+  async create(@Body() body: CreateAccountDto) {
     return this.createAccountHandler.execute(body.owner, body.balance);
   }
 

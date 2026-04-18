@@ -8,6 +8,7 @@ import { DomainErrorFilter } from '../../src/infrastructure/rest/error-filter';
 process.env.DATABASE_URL =
   process.env.DATABASE_URL ||
   'postgresql://onion:onion_local@localhost:5434/onion_bank_test';
+process.env.THROTTLE_LIMIT = process.env.THROTTLE_LIMIT || '10000';
 
 let app: INestApplication;
 

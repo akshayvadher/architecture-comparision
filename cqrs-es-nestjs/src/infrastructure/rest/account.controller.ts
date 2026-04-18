@@ -12,6 +12,7 @@ import { CreateAccountCommand } from '../../commands/create-account.command';
 import { GetAccountQuery } from '../../queries/get-account.query';
 import { GetAccountEventsQuery } from '../../queries/get-account-events.query';
 import { ListAccountsQuery } from '../../queries/list-accounts.query';
+import { CreateAccountDto } from './dto/create-account.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -22,7 +23,7 @@ export class AccountController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() body: { owner: string; balance: number }) {
+  async create(@Body() body: CreateAccountDto) {
     return this.commandBus.execute(
       new CreateAccountCommand(body.owner, body.balance),
     );

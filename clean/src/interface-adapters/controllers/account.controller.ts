@@ -6,6 +6,7 @@ import {
   presentAccount,
   presentAccountList,
 } from '../presenters/account.presenter';
+import { CreateAccountDto } from './dto/create-account.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -16,7 +17,7 @@ export class AccountController {
   ) {}
 
   @Post()
-  async create(@Body() body: { owner: string; balance: number }) {
+  async create(@Body() body: CreateAccountDto) {
     const output = await this.createAccount.execute({
       owner: body.owner,
       balance: body.balance,

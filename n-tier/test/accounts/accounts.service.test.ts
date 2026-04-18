@@ -1,7 +1,9 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AccountRow } from '../../src/accounts/accounts.repository';
-import type { AccountsRepository } from '../../src/accounts/accounts.repository';
+import type {
+  AccountRow,
+  AccountsRepository,
+} from '../../src/accounts/accounts.repository';
 import { AccountsService } from '../../src/accounts/accounts.service';
 
 const UUID = '11111111-2222-4333-8444-555555555555';

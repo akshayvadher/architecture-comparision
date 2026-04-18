@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { InitiateTransferDto } from './dto/initiate-transfer.dto';
 import { TransfersService } from './transfers.service';
 
 @Controller('transfers')
@@ -11,13 +12,7 @@ export class TransfersController {
   }
 
   @Post()
-  async create(
-    @Body() body: {
-      fromAccountId: string;
-      toAccountId: string;
-      amount: number;
-    },
-  ) {
+  async create(@Body() body: InitiateTransferDto) {
     return this.transfersService.executeTransfer(
       body.fromAccountId,
       body.toAccountId,

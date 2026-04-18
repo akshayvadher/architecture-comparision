@@ -12,6 +12,7 @@ const TEST_DATABASE_URL =
 process.env.DATABASE_URL = TEST_DATABASE_URL;
 process.env.PORT = process.env.PORT || '3004';
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+process.env.THROTTLE_LIMIT = process.env.THROTTLE_LIMIT || '10000';
 
 const pool = new Pool({ connectionString: TEST_DATABASE_URL });
 const db = drizzle({ client: pool, schema });

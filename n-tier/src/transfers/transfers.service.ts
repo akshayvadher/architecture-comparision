@@ -7,7 +7,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { AccountsRepository } from '../accounts/accounts.repository';
 import { DRIZZLE, type DrizzleDB } from '../database/drizzle.provider';
-import { TransfersRepository, type TransferRow } from './transfers.repository';
+import { type TransferRow, TransfersRepository } from './transfers.repository';
 
 export interface Transfer {
   id: string;

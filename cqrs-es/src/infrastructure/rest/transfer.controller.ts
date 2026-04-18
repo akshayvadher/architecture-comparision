@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { InitiateTransferHandler } from '../../commands/initiate-transfer.handler';
 import { GetTransferHandler } from '../../queries/get-transfer.handler';
+import { InitiateTransferDto } from './dto/initiate-transfer.dto';
 
 @Controller('transfers')
 export class TransferController {
@@ -19,13 +20,7 @@ export class TransferController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Body() body: {
-      fromAccountId: string;
-      toAccountId: string;
-      amount: number;
-    },
-  ) {
+  async create(@Body() body: InitiateTransferDto) {
     return this.initiateTransferHandler.execute(
       body.fromAccountId,
       body.toAccountId,
