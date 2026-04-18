@@ -216,3 +216,11 @@ The domain defines interfaces (`AccountRepository`, `TransferRepository`). Infra
 - **Domain events are write-only.** Without an event bus or subscribers, the events add complexity (extra table, extra persistence code) without enabling the reactive patterns that make them valuable.
 - **Aggregate boundaries are unclear.** `Account` has no reference to its transfers. The `Transfer` aggregate references account IDs but not account objects. The service orchestrates across both, which is correct DDD, but the boundaries feel artificial for this simple domain.
 - **No domain services.** The transfer logic (debit source, credit destination) lives in the application service, not a domain service. In stricter DDD, cross-aggregate operations belong in a domain service, keeping the application layer as pure orchestration.
+
+---
+
+References
+- [What is DDD - Eric Evans - DDD Europe 2019](https://www.youtube.com/watch?v=pMuiVlnGqjk)
+- [Event Storming - Alberto Brandolini - DDD Europe 2019](https://www.youtube.com/watch?v=mLXQIYEwK24)
+- [Bounded Contexts - Eric Evans - DDD Europe 2020](https://www.youtube.com/watch?v=am-HXycfalo)
+- [Implementing Domain Driven Design with Spring by Maciej Walkowiak @ Spring I/O 2024](https://www.youtube.com/watch?v=VGhg6Tfxb60)
