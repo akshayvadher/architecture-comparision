@@ -36,6 +36,7 @@ async function bootstrap() {
   });
 
   const port = configService.get('PORT', { infer: true });
+  app.enableShutdownHooks();
   await app.listen(port);
 }
 

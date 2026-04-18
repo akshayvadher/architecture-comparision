@@ -4,6 +4,7 @@ import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../../src/app.module';
 import { DRIZZLE } from '../../src/database/drizzle.provider';
+import { ReadinessService } from '../../src/health/readiness.service';
 import { db } from '../setup';
 
 describe('Health Endpoints — Integration Tests', () => {
@@ -65,6 +66,17 @@ describe('Health Endpoints — Integration Tests', () => {
         status: 'ok',
         info: { database: { status: 'up' } },
       });
+    });
+  });
+
+  describe('GET /health/ready — shutdown', () => {
+    it('returns 503 on /health/ready once shutdown begins', async () => {
+      const readiness = app.get(ReadinessService);
+      readiness.beforeApplicationShutdown();
+
+      const response = await request(app.getHttpServer()).get('/health/ready');
+
+      expect(response.status).toBe(503);
     });
   });
 });

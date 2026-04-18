@@ -1,4 +1,8 @@
-import type { Provider } from '@nestjs/common';
+import {
+  Injectable,
+  type OnModuleDestroy,
+  type Provider,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
@@ -9,15 +13,25 @@ export const DRIZZLE = Symbol('DRIZZLE');
 
 export type DrizzleDB = NodePgDatabase<typeof schema>;
 
-export const drizzleProvider: Provider = {
-  provide: DRIZZLE,
-  inject: [ConfigService],
-  useFactory: async (
-    configService: ConfigService<Env, true>,
-  ): Promise<DrizzleDB> => {
-    const pool = new Pool({
+@Injectable()
+export class DatabaseConnection implements OnModuleDestroy {
+  readonly pool: Pool;
+  readonly db: DrizzleDB;
+
+  constructor(configService: ConfigService<Env, true>) {
+    this.pool = new Pool({
       connectionString: configService.get('DATABASE_URL', { infer: true }),
     });
-    return drizzle({ client: pool, schema });
-  },
+    this.db = drizzle({ client: this.pool, schema });
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await this.pool.end();
+  }
+}
+
+export const drizzleProvider: Provider = {
+  provide: DRIZZLE,
+  inject: [DatabaseConnection],
+  useFactory: (connection: DatabaseConnection): DrizzleDB => connection.db,
 };

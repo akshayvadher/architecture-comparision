@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/infrastructure/app.module';
+import { ReadinessService } from '../src/infrastructure/health/readiness.service';
 import { TEST_DATABASE_URL } from './setup';
 
 describe('Health Endpoints — Integration Tests', () => {
@@ -63,6 +64,17 @@ describe('Health Endpoints — Integration Tests', () => {
         status: 'ok',
         info: { database: { status: 'up' } },
       });
+    });
+  });
+
+  describe('GET /health/ready — shutdown', () => {
+    it('returns 503 on /health/ready once shutdown begins', async () => {
+      const readiness = app.get(ReadinessService);
+      readiness.beforeApplicationShutdown();
+
+      const response = await request(app.getHttpServer()).get('/health/ready');
+
+      expect(response.status).toBe(503);
     });
   });
 });
