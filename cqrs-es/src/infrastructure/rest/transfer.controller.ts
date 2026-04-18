@@ -7,8 +7,8 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import type { InitiateTransferHandler } from '../../commands/initiate-transfer.handler';
-import type { GetTransferHandler } from '../../queries/get-transfer.handler';
+import { InitiateTransferHandler } from '../../commands/initiate-transfer.handler';
+import { GetTransferHandler } from '../../queries/get-transfer.handler';
 
 @Controller('transfers')
 export class TransferController {

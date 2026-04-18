@@ -3,7 +3,7 @@ import {
   AccountNotFoundError,
   InvalidIdError,
 } from '../domain/errors/domain-errors';
-import type { EventStore } from '../infrastructure/event-store/event-store';
+import { EventStore } from '../infrastructure/event-store/event-store';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

@@ -7,10 +7,10 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import type { CreateAccountHandler } from '../../commands/create-account.handler';
-import type { GetAccountHandler } from '../../queries/get-account.handler';
-import type { GetAccountEventsHandler } from '../../queries/get-account-events.handler';
-import type { ListAccountsHandler } from '../../queries/list-accounts.handler';
+import { CreateAccountHandler } from '../../commands/create-account.handler';
+import { GetAccountHandler } from '../../queries/get-account.handler';
+import { GetAccountEventsHandler } from '../../queries/get-account-events.handler';
+import { ListAccountsHandler } from '../../queries/list-accounts.handler';
 
 @Controller('accounts')
 export class AccountController {
