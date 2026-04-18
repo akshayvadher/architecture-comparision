@@ -198,3 +198,6 @@ The `UnitOfWork` port wraps transactional operations. The Drizzle adapter uses `
 - **Testing gap around transactions** -- The in-memory UnitOfWork does not actually simulate transactional behavior. You need integration tests to catch transaction-related bugs.
 - **No input validation at the API boundary** -- Controllers pass raw request bodies straight to services. There are no DTOs, no NestJS validation pipes. Validation happens in domain functions, which is architecturally pure but means malformed requests travel deeper into the stack before failing.
 - **Infrastructure folder is thin** -- `infrastructure/` only holds `app.module.ts` and `main.ts`. The Drizzle provider and schema live inside `adapters/driven/`. Whether the DB connection factory is "adapter" or "infrastructure" is debatable -- different hexagonal implementations place it differently.
+
+---
+Video reference: https://youtu.be/3siPsq17NAU
