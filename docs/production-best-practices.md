@@ -34,6 +34,9 @@ All 7 projects have zero logging, zero metrics, zero tracing, no health endpoint
 - [ ] **`GET /health/live`** — cheap liveness (process alive). Responds 200 with no dependency checks.
 - [ ] **`GET /health/ready`** — readiness: pings Postgres (`SELECT 1`). Returns 503 if dependencies down. Use `@nestjs/terminus`.
 - [ ] **Metrics endpoint** — `@willsoto/nestjs-prometheus` exposes `/metrics`. At minimum: HTTP request duration histogram, request counter by route+status, DB pool gauges.
+  - Each project ships a `MetricsModule` that registers `http_request_duration_seconds` (histogram), `http_requests_total` (counter), and `pg_pool_{total,idle,waiting}_connections/_clients` (gauges).
+  - `/metrics` is public and throttler-exempt: the `JwtAuthGuard` short-circuits for `/metrics`, and `ThrottlerModule.forRoot()` passes `skipIf` for the same path.
+  - The `HttpMetricsInterceptor` skips `/metrics` itself to avoid self-recursive counting. Routes are labeled with `req.route.path` (templates like `/accounts/:id`), not `req.url`, to keep cardinality bounded.
 - [ ] **Tracing** *(P1)* — OpenTelemetry SDK with auto-instrumentation for http + pg + Nest. Export OTLP to whatever collector your platform supports.
 - [ ] **Never log PII** — account numbers, balances, user identifiers. Add a pino redaction config for known sensitive fields.
 
@@ -75,8 +78,13 @@ Domain errors map to HTTP status well. A few process-level gaps remain.
 Good foundation. A few hardening items.
 
 - [ ] **Pool sizing** — set `max`, `idleTimeoutMillis`, `connectionTimeoutMillis` explicitly on `pg.Pool`. Defaults aren't tuned for your workload.
+  - Configured per project via env vars: `DB_POOL_MAX` (default 10), `DB_IDLE_TIMEOUT_MS` (default 30000), `DB_CONNECTION_TIMEOUT_MS` (default 5000). Validated by the Zod env schema.
 - [ ] **Statement timeout** — set `statement_timeout` on connection (or per-query) to kill runaway queries before they exhaust the pool.
+  - Applied via `pool.on('connect', …)` in each `DatabaseConnection`: `SET statement_timeout = <ms>` fires per new client. Tunable via `DB_STATEMENT_TIMEOUT_MS` (default 10000).
 - [ ] **Migrations in CI, not at boot** — run `drizzle-kit migrate` as a deploy step. Don't migrate on container start (race between replicas).
+  - Wired in `.github/workflows/ci.yml` as a dedicated `Run migrations` step after the CI Postgres service is up and before lint/build/test.
+  - The app's `main.ts` deliberately does NOT call `migrate()`. Each Dockerfile has an inline comment above `CMD` reminding operators of this.
+  - For production deploys, run `npm run db:migrate` as a one-shot job (e.g., an init-container or a pre-deploy CI step). Never bake it into the runtime CMD.
 - [ ] **Backups & PITR** — platform concern, but document retention and restore procedure.
 - [ ] **Read-your-own-writes semantics** — in CQRS/ES, the query side is eventually consistent. Document this for API consumers or add read-after-write fallbacks where UX requires it.
 

@@ -19,8 +19,25 @@ export class DatabaseConnection implements OnModuleDestroy {
   readonly db: DrizzleDB;
 
   constructor(configService: ConfigService<Env, true>) {
+    const statementTimeoutMs = configService.get('DB_STATEMENT_TIMEOUT_MS', {
+      infer: true,
+    });
     this.pool = new Pool({
       connectionString: configService.get('DATABASE_URL', { infer: true }),
+      max: configService.get('DB_POOL_MAX', { infer: true }),
+      idleTimeoutMillis: configService.get('DB_IDLE_TIMEOUT_MS', {
+        infer: true,
+      }),
+      connectionTimeoutMillis: configService.get('DB_CONNECTION_TIMEOUT_MS', {
+        infer: true,
+      }),
+    });
+    this.pool.on('connect', (client) => {
+      client
+        .query(`SET statement_timeout = ${statementTimeoutMs}`)
+        .catch(() => {
+          // Failure here is non-fatal — a pool connect error will surface via the regular error path.
+        });
     });
     this.db = drizzle({ client: this.pool, schema });
   }

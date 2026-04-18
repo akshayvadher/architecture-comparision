@@ -14,4 +14,7 @@ RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY --from=build /app/dist ./dist
 USER node
 EXPOSE 3002
+# Migrations must run as a separate deploy step (e.g., CI job) — NOT on
+# container start. Multiple replicas would race. See
+# docs/production-best-practices.md §6.
 CMD ["npm", "run", "start:prod"]

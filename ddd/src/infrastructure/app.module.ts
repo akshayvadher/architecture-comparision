@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
 import { HealthModule } from './health/health.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { DrizzleAccountRepository } from './persistence/drizzle/account-repository';
 import { DatabaseModule } from './persistence/drizzle/drizzle.provider';
 import { DrizzleTransferRepository } from './persistence/drizzle/transfer-repository';
@@ -94,12 +95,18 @@ import { TransferController } from './rest/transfer.controller';
         {
           ttl: config.get('THROTTLE_TTL_MS', { infer: true }),
           limit: config.get('THROTTLE_LIMIT', { infer: true }),
+          skipIf: (ctx) => {
+            const req = ctx.switchToHttp().getRequest<{ url?: string }>();
+            const url = req.url ?? '';
+            return url === '/metrics' || url.startsWith('/metrics?');
+          },
         },
       ],
     }),
     AuthModule,
     DatabaseModule,
     HealthModule,
+    MetricsModule,
   ],
   controllers: [AccountController, TransferController],
   providers: [

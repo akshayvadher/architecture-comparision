@@ -57,6 +57,11 @@ jobs:
           PGPASSWORD: ${{ matrix.project.pg.password }}
         run: psql -h localhost -U ${{ matrix.project.pg.user }} -d ${{ matrix.project.pg.db }} -f init-test-db.sql
 
+      # Migrations run as an explicit CI step — never on container boot — so
+      # replicas cannot race. See docs/production-best-practices.md §6.
+      - name: Run migrations (against CI Postgres)
+        run: npm run db:migrate
+
       - name: Lint
         run: npm run lint
 

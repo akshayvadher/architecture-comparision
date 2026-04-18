@@ -13,6 +13,7 @@ import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { TransfersModule } from './transfers/transfers.module';
 
 @Module({
@@ -86,6 +87,11 @@ import { TransfersModule } from './transfers/transfers.module';
         {
           ttl: config.get('THROTTLE_TTL_MS', { infer: true }),
           limit: config.get('THROTTLE_LIMIT', { infer: true }),
+          skipIf: (ctx) => {
+            const req = ctx.switchToHttp().getRequest<{ url?: string }>();
+            const url = req.url ?? '';
+            return url === '/metrics' || url.startsWith('/metrics?');
+          },
         },
       ],
     }),
@@ -94,6 +100,7 @@ import { TransfersModule } from './transfers/transfers.module';
     AccountsModule,
     TransfersModule,
     HealthModule,
+    MetricsModule,
   ],
   providers: [
     {

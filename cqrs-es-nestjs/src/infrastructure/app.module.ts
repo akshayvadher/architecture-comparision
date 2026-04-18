@@ -20,6 +20,7 @@ import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
 import { EventStore } from './event-store/event-store';
 import { HealthModule } from './health/health.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { DatabaseModule } from './persistence/database';
 import { AccountController } from './rest/account.controller';
 import { DomainErrorFilter } from './rest/error-filter';
@@ -96,6 +97,11 @@ import { TransferController } from './rest/transfer.controller';
         {
           ttl: config.get('THROTTLE_TTL_MS', { infer: true }),
           limit: config.get('THROTTLE_LIMIT', { infer: true }),
+          skipIf: (ctx) => {
+            const req = ctx.switchToHttp().getRequest<{ url?: string }>();
+            const url = req.url ?? '';
+            return url === '/metrics' || url.startsWith('/metrics?');
+          },
         },
       ],
     }),
@@ -103,6 +109,7 @@ import { TransferController } from './rest/transfer.controller';
     AuthModule,
     DatabaseModule,
     HealthModule,
+    MetricsModule,
   ],
   controllers: [AccountController, TransferController],
   providers: [

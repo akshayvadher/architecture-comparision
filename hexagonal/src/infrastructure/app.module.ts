@@ -22,6 +22,7 @@ import { TRANSFER_REPOSITORY } from '../domain/ports/transfer-repository.port';
 import { UNIT_OF_WORK } from '../domain/ports/unit-of-work.port';
 import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -94,12 +95,18 @@ import { validateEnv } from './config/env.validate';
         {
           ttl: config.get('THROTTLE_TTL_MS', { infer: true }),
           limit: config.get('THROTTLE_LIMIT', { infer: true }),
+          skipIf: (ctx) => {
+            const req = ctx.switchToHttp().getRequest<{ url?: string }>();
+            const url = req.url ?? '';
+            return url === '/metrics' || url.startsWith('/metrics?');
+          },
         },
       ],
     }),
     AuthModule,
     DatabaseModule,
     HealthModule,
+    MetricsModule,
   ],
   controllers: [AccountController, TransferController],
   providers: [
