@@ -233,3 +233,5 @@ Domain errors are plain `Error` subclasses defined in `entities/errors.ts`. The 
 - **NestJS coupling leaks in** — `@Injectable()` on use cases and `@Inject()` with Symbol tokens are NestJS-specific. The "framework-independent" benefit is diluted in practice.
 - **Indirection cost** — Following a request from controller to presenter requires jumping through 4+ files. New developers need to understand the full layer model before they can make a simple change.
 - **Presenter layer adds little in this project** — When the presenter just copies fields unchanged from the use case output, it is pure ceremony. It only pays for itself when API and domain shapes diverge.
+---
+Reference: https://www.youtube.com/watch?v=2dKZ-dWaCiU
