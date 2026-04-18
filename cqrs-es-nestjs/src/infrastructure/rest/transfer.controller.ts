@@ -7,7 +7,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import type { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { InitiateTransferCommand } from '../../commands/initiate-transfer.command';
 import { GetTransferQuery } from '../../queries/get-transfer.query';
 

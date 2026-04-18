@@ -10,12 +10,12 @@ import {
   TransferFailed,
   TransferInitiated,
 } from '../domain/events/transfer-events';
-import type {
-  DomainEvent,
+import {
+  type DomainEvent,
   EventStore,
 } from '../infrastructure/event-store/event-store';
-import type { AccountProjector } from '../projections/account.projector';
-import type { TransferProjector } from '../projections/transfer.projector';
+import { AccountProjector } from '../projections/account.projector';
+import { TransferProjector } from '../projections/transfer.projector';
 import { InitiateTransferCommand } from './initiate-transfer.command';
 
 interface TransferResult {

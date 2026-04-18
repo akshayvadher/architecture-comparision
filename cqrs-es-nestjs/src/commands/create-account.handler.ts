@@ -1,10 +1,10 @@
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { Account } from '../domain/aggregates/account';
-import type {
-  DomainEvent,
+import {
+  type DomainEvent,
   EventStore,
 } from '../infrastructure/event-store/event-store';
-import type { AccountProjector } from '../projections/account.projector';
+import { AccountProjector } from '../projections/account.projector';
 import { CreateAccountCommand } from './create-account.command';
 
 @CommandHandler(CreateAccountCommand)

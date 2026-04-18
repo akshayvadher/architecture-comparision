@@ -7,7 +7,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import type { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateAccountCommand } from '../../commands/create-account.command';
 import { GetAccountQuery } from '../../queries/get-account.query';
 import { GetAccountEventsQuery } from '../../queries/get-account-events.query';
