@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import type { GetTransferUseCase } from '../../use-cases/get-transfer/get-transfer.use-case';
-import type { InitiateTransferUseCase } from '../../use-cases/initiate-transfer/initiate-transfer.use-case';
+import { GetTransferUseCase } from '../../use-cases/get-transfer/get-transfer.use-case';
+import { InitiateTransferUseCase } from '../../use-cases/initiate-transfer/initiate-transfer.use-case';
 import { presentTransfer } from '../presenters/transfer.presenter';
 
 @Controller('transfers')
