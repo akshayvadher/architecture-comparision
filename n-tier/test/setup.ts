@@ -9,6 +9,10 @@ const TEST_DATABASE_URL =
   process.env.DATABASE_URL ||
   'postgresql://ntier:ntier_local@localhost:5432/ntier_bank_test';
 
+process.env.DATABASE_URL = TEST_DATABASE_URL;
+process.env.PORT = process.env.PORT || '3000';
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+
 const pool = new Pool({ connectionString: TEST_DATABASE_URL });
 const db = drizzle({ client: pool, schema });
 

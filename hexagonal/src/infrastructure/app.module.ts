@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { DrizzleAccountRepository } from '../adapters/driven/persistence/drizzle/account-repository.adapter';
 import { drizzleProvider } from '../adapters/driven/persistence/drizzle/drizzle.provider';
@@ -12,8 +13,16 @@ import { TransferService } from '../application/transfer.service';
 import { ACCOUNT_REPOSITORY } from '../domain/ports/account-repository.port';
 import { TRANSFER_REPOSITORY } from '../domain/ports/transfer-repository.port';
 import { UNIT_OF_WORK } from '../domain/ports/unit-of-work.port';
+import { validateEnv } from './config/env.validate';
 
 @Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      ignoreEnvFile: true,
+      validate: validateEnv,
+    }),
+  ],
   controllers: [AccountController, TransferController],
   providers: [
     drizzleProvider,

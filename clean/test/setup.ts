@@ -9,6 +9,10 @@ const TEST_DATABASE_URL =
   process.env.DATABASE_URL ||
   'postgresql://clean:clean_local@localhost:5435/clean_bank_test';
 
+process.env.DATABASE_URL = TEST_DATABASE_URL;
+process.env.PORT = process.env.PORT || '3003';
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+
 const pool = new Pool({ connectionString: TEST_DATABASE_URL });
 const db = drizzle({ client: pool, schema });
 
