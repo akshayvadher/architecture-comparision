@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { asc, eq } from 'drizzle-orm';
 import { ConcurrencyError } from '../../domain/errors/domain-errors';
 import { DRIZZLE, type DrizzleDB } from '../persistence/database';
-import { events } from '../persistence/schema';
+import { events, outbox } from '../persistence/schema';
 
 export interface StoredEvent {
   id: string;
@@ -19,6 +19,16 @@ export interface DomainEvent {
   data: Record<string, unknown>;
 }
 
+interface EventRow {
+  id: string;
+  aggregateId: string;
+  aggregateType: string;
+  eventType: string;
+  eventData: Record<string, unknown>;
+  version: number;
+  timestamp: Date;
+}
+
 @Injectable()
 export class EventStore {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
@@ -29,18 +39,18 @@ export class EventStore {
     newEvents: DomainEvent[],
     expectedVersion: number,
   ): Promise<void> {
-    const rows = newEvents.map((event, index) => ({
-      id: crypto.randomUUID(),
+    const rows = buildEventRows(
       aggregateId,
       aggregateType,
-      eventType: event.type,
-      eventData: event.data,
-      version: expectedVersion + index + 1,
-      timestamp: new Date(),
-    }));
+      newEvents,
+      expectedVersion,
+    );
 
     try {
-      await this.db.insert(events).values(rows);
+      await this.db.transaction(async (tx) => {
+        await tx.insert(events).values(rows);
+        await tx.insert(outbox).values(rows.map(toOutboxRow));
+      });
     } catch (error: unknown) {
       if (isUniqueViolation(error)) {
         throw new ConcurrencyError(aggregateId);
@@ -58,19 +68,19 @@ export class EventStore {
     }>,
   ): Promise<void> {
     const allRows = batches.flatMap((batch) =>
-      batch.events.map((event, index) => ({
-        id: crypto.randomUUID(),
-        aggregateId: batch.aggregateId,
-        aggregateType: batch.aggregateType,
-        eventType: event.type,
-        eventData: event.data,
-        version: batch.expectedVersion + index + 1,
-        timestamp: new Date(),
-      })),
+      buildEventRows(
+        batch.aggregateId,
+        batch.aggregateType,
+        batch.events,
+        batch.expectedVersion,
+      ),
     );
 
     try {
-      await this.db.insert(events).values(allRows);
+      await this.db.transaction(async (tx) => {
+        await tx.insert(events).values(allRows);
+        await tx.insert(outbox).values(allRows.map(toOutboxRow));
+      });
     } catch (error: unknown) {
       if (isUniqueViolation(error)) {
         const aggregateIds = batches.map((b) => b.aggregateId).join(', ');
@@ -87,6 +97,32 @@ export class EventStore {
       .where(eq(events.aggregateId, aggregateId))
       .orderBy(asc(events.version));
   }
+}
+
+function buildEventRows(
+  aggregateId: string,
+  aggregateType: string,
+  newEvents: DomainEvent[],
+  expectedVersion: number,
+): EventRow[] {
+  return newEvents.map((event, index) => ({
+    id: crypto.randomUUID(),
+    aggregateId,
+    aggregateType,
+    eventType: event.type,
+    eventData: event.data,
+    version: expectedVersion + index + 1,
+    timestamp: new Date(),
+  }));
+}
+
+function toOutboxRow(row: EventRow) {
+  return {
+    aggregateId: row.aggregateId,
+    aggregateType: row.aggregateType,
+    eventType: row.eventType,
+    eventData: row.eventData,
+  };
 }
 
 function isUniqueViolation(error: unknown): boolean {

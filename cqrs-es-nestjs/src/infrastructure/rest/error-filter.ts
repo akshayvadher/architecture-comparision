@@ -51,6 +51,17 @@ function extractHttpMessage(exception: HttpException): string {
   return message ?? exception.message;
 }
 
+function extractHttpCode(exception: HttpException): string {
+  const body = exception.getResponse();
+  if (typeof body === 'object' && body !== null) {
+    const code = (body as { code?: unknown }).code;
+    if (typeof code === 'string') {
+      return code;
+    }
+  }
+  return exception.constructor.name;
+}
+
 function resolveRequestId(req: unknown, res: unknown): string | undefined {
   const reqId = (req as { id?: unknown } | null)?.id;
   if (typeof reqId === 'string') {
@@ -98,7 +109,7 @@ export class DomainErrorFilter implements ExceptionFilter {
         .status(status)
         .json(
           buildBody(
-            exception.constructor.name,
+            extractHttpCode(exception),
             extractHttpMessage(exception),
             requestId,
           ),

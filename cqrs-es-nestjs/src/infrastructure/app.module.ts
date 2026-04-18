@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
@@ -20,7 +20,9 @@ import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
 import { EventStore } from './event-store/event-store';
 import { HealthModule } from './health/health.module';
+import { IdempotencyInterceptor } from './idempotency/idempotency.interceptor';
 import { MetricsModule } from './metrics/metrics.module';
+import { OutboxPublisher } from './outbox/outbox-publisher.service';
 import { DatabaseModule } from './persistence/database';
 import { AccountController } from './rest/account.controller';
 import { DomainErrorFilter } from './rest/error-filter';
@@ -122,6 +124,7 @@ import { TransferController } from './rest/transfer.controller';
     GetAccountEventsHandler,
     AccountProjector,
     TransferProjector,
+    OutboxPublisher,
     {
       provide: APP_FILTER,
       useClass: DomainErrorFilter,
@@ -133,6 +136,10 @@ import { TransferController } from './rest/transfer.controller';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: IdempotencyInterceptor,
     },
   ],
 })
