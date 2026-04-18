@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    name: verify (${{ matrix.project.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - { name: clean,          pg: { user: clean,          password: clean_local,          db: clean_bank_test } }
+          - { name: cqrs-es,        pg: { user: cqrs_es,        password: cqrs_es_local,        db: cqrs_es_bank } }
+          - { name: cqrs-es-nestjs, pg: { user: cqrs_es_nestjs, password: cqrs_es_nestjs_local, db: cqrs_es_nestjs_bank } }
+          - { name: ddd,            pg: { user: ddd,            password: ddd_local,            db: ddd_bank } }
+          - { name: hexagonal,      pg: { user: hexagonal,      password: hexagonal_local,      db: hexagonal_bank_test } }
+          - { name: n-tier,         pg: { user: ntier,          password: ntier_local,          db: ntier_bank_test } }
+          - { name: onion,          pg: { user: onion,          password: onion_local,          db: onion_bank_test } }
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: ${{ matrix.project.pg.user }}
+          POSTGRES_PASSWORD: ${{ matrix.project.pg.password }}
+          POSTGRES_DB: ${{ matrix.project.pg.db }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: ./${{ matrix.project.name }}
+    env:
+      DATABASE_URL: postgresql://${{ matrix.project.pg.user }}:${{ matrix.project.pg.password }}@localhost:5432/${{ matrix.project.pg.db }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.project.name }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run project init-test-db.sql (if present)
+        if: ${{ hashFiles(format('{0}/init-test-db.sql', matrix.project.name)) != '' }}
+        env:
+          PGPASSWORD: ${{ matrix.project.pg.password }}
+        run: psql -h localhost -U ${{ matrix.project.pg.user }} -d ${{ matrix.project.pg.db }} -f init-test-db.sql
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      # npm audit is advisory for the initial rollout (see docs/production-best-practices.md §8).
+      # A follow-up step will remove continue-on-error so high/critical findings fail CI.
+      - name: Audit (production deps, high+)
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true

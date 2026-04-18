@@ -6,7 +6,7 @@
     "build": "nest build",
     "start": "dotenvx run -- nest start",
     "start:dev": "dotenvx run -- nest start --watch",
-    "start:prod": "dotenvx run -- node dist/main.js",
+    "start:prod": "dotenvx run -- node dist/src/infrastructure/main.js",
     "test": "vitest run && vitest run --config vitest.integration.config.mts",
     "test:unit": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.mts",
@@ -44,5 +44,8 @@
     "typescript": "^5.7.0",
     "unplugin-swc": "^1.5.0",
     "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=22 <23"
   }
 }
