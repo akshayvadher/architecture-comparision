@@ -11,6 +11,7 @@ import { DatabaseModule } from '../adapters/driven/persistence/drizzle/drizzle.p
 import { DrizzleTransferRepository } from '../adapters/driven/persistence/drizzle/transfer-repository.adapter';
 import { DrizzleUnitOfWork } from '../adapters/driven/persistence/drizzle/unit-of-work.adapter';
 import { AccountController } from '../adapters/driving/rest/account.controller';
+import { AuthModule } from '../adapters/driving/rest/auth/auth.module';
 import { DomainErrorFilter } from '../adapters/driving/rest/error-filter';
 import { HealthModule } from '../adapters/driving/rest/health/health.module';
 import { TransferController } from '../adapters/driving/rest/transfer.controller';
@@ -96,6 +97,7 @@ import { validateEnv } from './config/env.validate';
         },
       ],
     }),
+    AuthModule,
     DatabaseModule,
     HealthModule,
   ],

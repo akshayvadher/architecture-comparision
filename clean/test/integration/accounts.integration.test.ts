@@ -61,9 +61,7 @@ describe('POST /accounts — integration', () => {
 
     expect(response.body.error.message).toMatch(/owner/i);
     expect(response.body.error.code).toBeDefined();
-    expect(response.body.error.requestId).toMatch(
-      /^[0-9a-f-]{36}$/i,
-    );
+    expect(response.body.error.requestId).toMatch(/^[0-9a-f-]{36}$/i);
   });
 
   it('rejects empty owner string with 400', async () => {

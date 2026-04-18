@@ -11,6 +11,7 @@ import { TransferService } from '../application/transfer.service';
 import { ACCOUNT_REPOSITORY } from '../domain/services/account-repository.interface';
 import { TRANSFER_REPOSITORY } from '../domain/services/transfer-repository.interface';
 import { UNIT_OF_WORK } from '../domain/services/unit-of-work.interface';
+import { AuthModule } from './auth/auth.module';
 import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
 import { HealthModule } from './health/health.module';
@@ -96,6 +97,7 @@ import { TransferController } from './rest/transfer.controller';
         },
       ],
     }),
+    AuthModule,
     DatabaseModule,
     HealthModule,
   ],

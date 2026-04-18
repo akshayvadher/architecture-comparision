@@ -14,6 +14,7 @@ import { GetAccountHandler } from '../queries/get-account.handler';
 import { GetAccountEventsHandler } from '../queries/get-account-events.handler';
 import { GetTransferHandler } from '../queries/get-transfer.handler';
 import { ListAccountsHandler } from '../queries/list-accounts.handler';
+import { AuthModule } from './auth/auth.module';
 import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
 import { EventStore } from './event-store/event-store';
@@ -97,6 +98,7 @@ import { TransferController } from './rest/transfer.controller';
         },
       ],
     }),
+    AuthModule,
     DatabaseModule,
     HealthModule,
   ],

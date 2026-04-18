@@ -17,6 +17,7 @@ import { GetAccountUseCase } from '../use-cases/get-account/get-account.use-case
 import { GetTransferUseCase } from '../use-cases/get-transfer/get-transfer.use-case';
 import { InitiateTransferUseCase } from '../use-cases/initiate-transfer/initiate-transfer.use-case';
 import { ListAccountsUseCase } from '../use-cases/list-accounts/list-accounts.use-case';
+import { AuthModule } from './auth/auth.module';
 import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
 import { HealthModule } from './health/health.module';
@@ -99,6 +100,7 @@ import { DrizzleUnitOfWork } from './persistence/drizzle/unit-of-work';
         },
       ],
     }),
+    AuthModule,
     DatabaseModule,
     HealthModule,
   ],

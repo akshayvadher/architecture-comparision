@@ -7,6 +7,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AccountsModule } from './accounts/accounts.module';
+import { AuthModule } from './auth/auth.module';
 import { HttpErrorFilter } from './common/validation-error-filter';
 import type { Env } from './config/env.schema';
 import { validateEnv } from './config/env.validate';
@@ -88,6 +89,7 @@ import { TransfersModule } from './transfers/transfers.module';
         },
       ],
     }),
+    AuthModule,
     DatabaseModule,
     AccountsModule,
     TransfersModule,
