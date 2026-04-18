@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { json, urlencoded } from 'express';
 import helmet from 'helmet';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import type { Env } from './config/env.schema';
 
@@ -14,7 +15,12 @@ function parseCorsOrigins(raw: string | undefined): string[] {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+    bodyParser: false,
+  });
+  app.useLogger(app.get(Logger));
+
   const configService = app.get(ConfigService<Env, true>);
 
   app.use(json({ limit: '100kb' }));

@@ -1,4 +1,4 @@
-import type { Provider } from '@nestjs/common';
+import { Global, Module, type Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
@@ -21,3 +21,10 @@ export const drizzleProvider: Provider = {
     return drizzle({ client: pool, schema });
   },
 };
+
+@Global()
+@Module({
+  providers: [drizzleProvider],
+  exports: [DRIZZLE],
+})
+export class DatabaseModule {}
