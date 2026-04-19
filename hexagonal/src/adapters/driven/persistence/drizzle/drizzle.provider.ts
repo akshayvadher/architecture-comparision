@@ -33,13 +33,10 @@ export class DatabaseConnection implements OnModuleDestroy {
       connectionTimeoutMillis: configService.get('DB_CONNECTION_TIMEOUT_MS', {
         infer: true,
       }),
-    });
-    this.pool.on('connect', (client) => {
-      client
-        .query(`SET statement_timeout = ${statementTimeoutMs}`)
-        .catch(() => {
-          // Failure here is non-fatal — a pool connect error will surface via the regular error path.
-        });
+      // Set statement_timeout as a backend startup option so it's active
+      // before the client is returned by the pool — avoids racing a post-
+      // connect `SET` query against the first real query.
+      options: `-c statement_timeout=${statementTimeoutMs}`,
     });
     this.db = drizzle({ client: this.pool, schema });
   }
