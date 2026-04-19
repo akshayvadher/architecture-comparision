@@ -44,7 +44,9 @@ describe('Aggregate snapshotting — Integration (HTTP + real DB)', () => {
       .post('/transfers')
       .send({ fromAccountId: fromId, toAccountId: toId, amount });
     if (res.status !== 201) {
-      throw new Error(`transfer failed ${res.status}: ${JSON.stringify(res.body)}`);
+      throw new Error(
+        `transfer failed ${res.status}: ${JSON.stringify(res.body)}`,
+      );
     }
     return res;
   }
