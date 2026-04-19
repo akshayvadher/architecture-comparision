@@ -3,3 +3,4 @@ dist/
 .env.keys
 .env.local
 .env.*.local
+coverage/

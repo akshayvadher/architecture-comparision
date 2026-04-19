@@ -1,5 +1,6 @@
+import { ConfigService } from '@nestjs/config';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
-import { Account } from '../domain/aggregates/account';
+import { Account, type AccountSnapshot } from '../domain/aggregates/account';
 import {
   AccountNotFoundError,
   InsufficientFundsError,
@@ -10,6 +11,7 @@ import {
   TransferFailed,
   TransferInitiated,
 } from '../domain/events/transfer-events';
+import type { Env } from '../infrastructure/config/env.schema';
 import {
   type DomainEvent,
   EventStore,
@@ -31,11 +33,18 @@ interface TransferResult {
 export class InitiateTransferHandler
   implements ICommandHandler<InitiateTransferCommand>
 {
+  private readonly snapshotEveryNEvents: number;
+
   constructor(
     private readonly eventStore: EventStore,
     private readonly accountProjector: AccountProjector,
     private readonly transferProjector: TransferProjector,
-  ) {}
+    configService: ConfigService<Env, true>,
+  ) {
+    this.snapshotEveryNEvents = configService.get('SNAPSHOT_EVERY_N_EVENTS', {
+      infer: true,
+    });
+  }
 
   async execute(command: InitiateTransferCommand): Promise<TransferResult> {
     const { fromAccountId, toAccountId, amount } = command;
@@ -95,6 +104,21 @@ export class InitiateTransferHandler
   }
 
   private async loadAccount(accountId: string): Promise<Account> {
+    const snapshot = await this.eventStore.loadSnapshot(accountId, 'Account');
+
+    if (snapshot) {
+      const newerEvents = await this.eventStore.loadEventsSince(
+        accountId,
+        snapshot.version,
+      );
+      const account = Account.fromSnapshot(snapshot.state as AccountSnapshot);
+      if (newerEvents.length > 0) {
+        const deserialized = this.eventStore.deserializeEvents(newerEvents);
+        account.loadFromHistory(deserialized);
+      }
+      return account;
+    }
+
     const storedEvents = await this.eventStore.loadEvents(accountId);
     if (storedEvents.length === 0) {
       throw new AccountNotFoundError(accountId);
@@ -104,6 +128,25 @@ export class InitiateTransferHandler
     const account = new Account();
     account.loadFromHistory(deserialized);
     return account;
+  }
+
+  private async maybeSnapshotAccount(
+    accountId: string,
+    newVersion: number,
+  ): Promise<void> {
+    if (newVersion % this.snapshotEveryNEvents !== 0) {
+      return;
+    }
+    const storedEvents = await this.eventStore.loadEvents(accountId);
+    const deserialized = this.eventStore.deserializeEvents(storedEvents);
+    const account = new Account();
+    account.loadFromHistory(deserialized);
+    await this.eventStore.saveSnapshot(
+      accountId,
+      'Account',
+      account.version,
+      account.toSnapshot(),
+    );
   }
 
   private async persistSuccessfulTransfer(
@@ -160,6 +203,15 @@ export class InitiateTransferHandler
       toAccountId,
       amount,
       timestamp,
+    );
+
+    await this.maybeSnapshotAccount(
+      fromAccountId,
+      sourceVersion + sourceEvents.length,
+    );
+    await this.maybeSnapshotAccount(
+      toAccountId,
+      destinationVersion + destinationEvents.length,
     );
 
     return {

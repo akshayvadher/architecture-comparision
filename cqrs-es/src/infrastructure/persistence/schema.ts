@@ -70,3 +70,19 @@ export const outbox = pgTable('outbox', {
     .notNull(),
   publishedAt: timestamp('published_at', { withTimezone: true }),
 });
+
+export const snapshots = pgTable(
+  'snapshots',
+  {
+    aggregateId: uuid('aggregate_id').notNull(),
+    aggregateType: text('aggregate_type').notNull(),
+    version: integer('version').notNull(),
+    state: jsonb('state').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.aggregateId, table.aggregateType] }),
+  ],
+);

@@ -17,6 +17,8 @@ export const envSchema = z
     DB_IDLE_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
     DB_CONNECTION_TIMEOUT_MS: z.coerce.number().int().positive().default(5_000),
     DB_STATEMENT_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
+    OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
+    OTEL_SERVICE_NAME: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.NODE_ENV !== 'production') {

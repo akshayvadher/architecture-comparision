@@ -38,6 +38,7 @@ beforeEach(async () => {
   await db.execute(sql`TRUNCATE TABLE transfer_read_model CASCADE`);
   await db.execute(sql`TRUNCATE TABLE idempotency_keys CASCADE`);
   await db.execute(sql`TRUNCATE TABLE outbox CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE snapshots CASCADE`);
 });
 
 afterAll(async () => {

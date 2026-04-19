@@ -10,6 +10,14 @@ import type {
   AccountEvent,
 } from '../events/account-events';
 
+export interface AccountSnapshot {
+  id: string;
+  owner: string;
+  balance: number;
+  status: string;
+  version: number;
+}
+
 export class Account {
   readonly id: string;
   readonly owner: string;
@@ -72,6 +80,37 @@ export class Account {
 
   static reconstitute(events: AccountEvent[]): Account {
     let account = new Account('', '', 0, '', 0);
+    for (const event of events) {
+      account = account.apply(event);
+    }
+    return account;
+  }
+
+  toSnapshot(): AccountSnapshot {
+    return {
+      id: this.id,
+      owner: this.owner,
+      balance: this.balance,
+      status: this.status,
+      version: this.version,
+    };
+  }
+
+  static fromSnapshot(state: AccountSnapshot): Account {
+    return new Account(
+      state.id,
+      state.owner,
+      state.balance,
+      state.status,
+      state.version,
+    );
+  }
+
+  static replayFromSnapshot(
+    snapshot: AccountSnapshot,
+    events: AccountEvent[],
+  ): Account {
+    let account = Account.fromSnapshot(snapshot);
     for (const event of events) {
       account = account.apply(event);
     }

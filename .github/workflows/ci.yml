@@ -71,8 +71,9 @@ jobs:
       - name: Test
         run: npm test
 
-      # npm audit is advisory for the initial rollout (see docs/production-best-practices.md §8).
-      # A follow-up step will remove continue-on-error so high/critical findings fail CI.
+      - name: Coverage (unit tests with thresholds)
+        run: npm run test:coverage
+
+      # npm audit fails the build on high/critical production vulnerabilities.
       - name: Audit (production deps, high+)
         run: npm audit --omit=dev --audit-level=high
-        continue-on-error: true

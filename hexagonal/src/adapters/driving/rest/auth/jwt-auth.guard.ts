@@ -15,7 +15,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
-    if (this.isMetricsEndpoint(context)) {
+    if (this.isUnauthenticatedEndpoint(context)) {
       return true;
     }
     if (this.isPublic(context)) {
@@ -27,10 +27,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  private isMetricsEndpoint(context: ExecutionContext): boolean {
+  private isUnauthenticatedEndpoint(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<{ url?: string }>();
     const url = req.url ?? '';
-    return url === '/metrics' || url.startsWith('/metrics?');
+    return (
+      url === '/metrics' ||
+      url.startsWith('/metrics?') ||
+      url === '/docs' ||
+      url.startsWith('/docs/') ||
+      url.startsWith('/docs?') ||
+      url === '/docs-json' ||
+      url.startsWith('/docs-json?')
+    );
   }
 
   private isPublic(context: ExecutionContext): boolean {

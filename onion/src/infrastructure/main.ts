@@ -1,3 +1,5 @@
+import './tracing/tracing';
+import type { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { json, urlencoded } from 'express';
@@ -12,6 +14,18 @@ function parseCorsOrigins(raw: string | undefined): string[] {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+}
+
+async function setupSwagger(app: INestApplication, title: string) {
+  const { SwaggerModule, DocumentBuilder } = await import('@nestjs/swagger');
+  const { cleanupOpenApiDoc } = await import('nestjs-zod');
+  const config = new DocumentBuilder()
+    .setTitle(title)
+    .setVersion('1.0.0')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
+    .build();
+  const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
+  SwaggerModule.setup('docs', app, document);
 }
 
 async function bootstrap() {
@@ -34,6 +48,10 @@ async function bootstrap() {
     origin: corsOrigins.length ? corsOrigins : false,
     credentials: true,
   });
+
+  if (configService.get('NODE_ENV', { infer: true }) !== 'production') {
+    await setupSwagger(app, 'onion');
+  }
 
   const port = configService.get('PORT', { infer: true });
   app.enableShutdownHooks();

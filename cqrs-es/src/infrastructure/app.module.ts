@@ -101,7 +101,15 @@ import { TransferController } from './rest/transfer.controller';
           skipIf: (ctx) => {
             const req = ctx.switchToHttp().getRequest<{ url?: string }>();
             const url = req.url ?? '';
-            return url === '/metrics' || url.startsWith('/metrics?');
+            return (
+              url === '/metrics' ||
+              url.startsWith('/metrics?') ||
+              url === '/docs' ||
+              url.startsWith('/docs/') ||
+              url.startsWith('/docs?') ||
+              url === '/docs-json' ||
+              url.startsWith('/docs-json?')
+            );
           },
         },
       ],

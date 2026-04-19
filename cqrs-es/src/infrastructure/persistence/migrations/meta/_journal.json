@@ -29,6 +29,13 @@
       "when": 1776538776359,
       "tag": "0003_add_idempotency_and_outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776540113258,
+      "tag": "0004_hesitant_cyclops",
+      "breakpoints": true
     }
   ]
 }

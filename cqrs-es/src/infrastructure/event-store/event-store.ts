@@ -1,8 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq, gt } from 'drizzle-orm';
 import { ConcurrencyError } from '../../domain/errors/domain-errors';
 import { DRIZZLE, type DrizzleDB } from '../persistence/database';
-import { events, outbox } from '../persistence/schema';
+import { events, outbox, snapshots } from '../persistence/schema';
+
+export interface StoredSnapshot {
+  version: number;
+  state: unknown;
+}
 
 export interface StoredEvent {
   id: string;
@@ -96,6 +101,62 @@ export class EventStore {
       .from(events)
       .where(eq(events.aggregateId, aggregateId))
       .orderBy(asc(events.version));
+  }
+
+  async loadEventsSince(
+    aggregateId: string,
+    afterVersion: number,
+  ): Promise<StoredEvent[]> {
+    return this.db
+      .select()
+      .from(events)
+      .where(
+        and(
+          eq(events.aggregateId, aggregateId),
+          gt(events.version, afterVersion),
+        ),
+      )
+      .orderBy(asc(events.version));
+  }
+
+  async saveSnapshot(
+    aggregateId: string,
+    aggregateType: string,
+    version: number,
+    state: unknown,
+  ): Promise<void> {
+    await this.db
+      .insert(snapshots)
+      .values({
+        aggregateId,
+        aggregateType,
+        version,
+        state: state as Record<string, unknown>,
+      })
+      .onConflictDoUpdate({
+        target: [snapshots.aggregateId, snapshots.aggregateType],
+        set: { version, state: state as Record<string, unknown> },
+      });
+  }
+
+  async loadSnapshot(
+    aggregateId: string,
+    aggregateType: string,
+  ): Promise<StoredSnapshot | null> {
+    const rows = await this.db
+      .select({ version: snapshots.version, state: snapshots.state })
+      .from(snapshots)
+      .where(
+        and(
+          eq(snapshots.aggregateId, aggregateId),
+          eq(snapshots.aggregateType, aggregateType),
+        ),
+      )
+      .limit(1);
+    if (rows.length === 0) {
+      return null;
+    }
+    return { version: rows[0].version, state: rows[0].state };
   }
 }
 

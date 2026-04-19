@@ -29,6 +29,13 @@
       "when": 1776538785138,
       "tag": "0003_add_idempotency_and_outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776540114972,
+      "tag": "0004_groovy_tempest",
+      "breakpoints": true
     }
   ]
 }

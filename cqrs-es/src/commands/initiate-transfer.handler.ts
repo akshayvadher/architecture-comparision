@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Account } from '../domain/aggregates/account';
+import { ConfigService } from '@nestjs/config';
+import { Account, type AccountSnapshot } from '../domain/aggregates/account';
 import {
   AccountNotFoundError,
   InsufficientFundsError,
   InvalidAmountError,
 } from '../domain/errors/domain-errors';
+import type { AccountEvent } from '../domain/events/account-events';
 import type {
   TransferCompletedEvent,
   TransferFailedEvent,
   TransferInitiatedEvent,
 } from '../domain/events/transfer-events';
+import type { Env } from '../infrastructure/config/env.schema';
 import { EventStore } from '../infrastructure/event-store/event-store';
 import { AccountProjector } from '../projections/account.projector';
 import { TransferProjector } from '../projections/transfer.projector';
@@ -25,11 +28,18 @@ export interface TransferResult {
 
 @Injectable()
 export class InitiateTransferHandler {
+  private readonly snapshotEveryNEvents: number;
+
   constructor(
     private readonly eventStore: EventStore,
     private readonly accountProjector: AccountProjector,
     private readonly transferProjector: TransferProjector,
-  ) {}
+    configService: ConfigService<Env, true>,
+  ) {
+    this.snapshotEveryNEvents = configService.get('SNAPSHOT_EVERY_N_EVENTS', {
+      infer: true,
+    });
+  }
 
   async execute(
     fromAccountId: string,
@@ -86,18 +96,42 @@ export class InitiateTransferHandler {
   }
 
   private async loadAccount(accountId: string): Promise<Account> {
+    const snapshot = await this.eventStore.loadSnapshot(accountId, 'Account');
+
+    if (snapshot) {
+      const newerEvents = await this.eventStore.loadEventsSince(
+        accountId,
+        snapshot.version,
+      );
+      const accountEvents = toAccountEvents(newerEvents);
+      return Account.replayFromSnapshot(
+        snapshot.state as AccountSnapshot,
+        accountEvents,
+      );
+    }
+
     const storedEvents = await this.eventStore.loadEvents(accountId);
     if (storedEvents.length === 0) {
       throw new AccountNotFoundError(accountId);
     }
 
-    const domainEvents = storedEvents.map((e) => ({
-      type: e.eventType,
-      data: e.eventData as Record<string, unknown>,
-    }));
+    return Account.reconstitute(toAccountEvents(storedEvents));
+  }
 
-    return Account.reconstitute(
-      domainEvents as Parameters<typeof Account.reconstitute>[0],
+  private async maybeSnapshotAccount(
+    accountId: string,
+    newVersion: number,
+  ): Promise<void> {
+    if (newVersion % this.snapshotEveryNEvents !== 0) {
+      return;
+    }
+    const events = await this.eventStore.loadEvents(accountId);
+    const account = Account.reconstitute(toAccountEvents(events));
+    await this.eventStore.saveSnapshot(
+      accountId,
+      'Account',
+      account.version,
+      account.toSnapshot(),
     );
   }
 
@@ -146,6 +180,9 @@ export class InitiateTransferHandler {
       timestamp,
     );
 
+    await this.maybeSnapshotAccount(fromAccountId, sourceVersion + 1);
+    await this.maybeSnapshotAccount(toAccountId, destinationVersion + 1);
+
     return {
       id: transferId,
       fromAccountId,
@@ -192,6 +229,15 @@ export class InitiateTransferHandler {
       status: 'FAILED',
     };
   }
+}
+
+function toAccountEvents(
+  stored: Array<{ eventType: string; eventData: unknown }>,
+): AccountEvent[] {
+  return stored.map((e) => ({
+    type: e.eventType,
+    data: e.eventData as Record<string, unknown>,
+  })) as AccountEvent[];
 }
 
 function buildTransferInitiatedEvent(

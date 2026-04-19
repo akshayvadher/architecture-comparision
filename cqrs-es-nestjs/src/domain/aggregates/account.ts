@@ -10,6 +10,14 @@ import {
   AccountDebited,
 } from '../events/account-events';
 
+export interface AccountSnapshot {
+  id: string;
+  owner: string;
+  balance: number;
+  status: string;
+  version: number;
+}
+
 export class Account extends AggregateRoot {
   private _id: string = '';
   private _owner: string = '';
@@ -69,5 +77,25 @@ export class Account extends AggregateRoot {
   onAccountCredited(event: AccountCredited): void {
     this._balance += event.amount;
     this._version++;
+  }
+
+  toSnapshot(): AccountSnapshot {
+    return {
+      id: this._id,
+      owner: this._owner,
+      balance: this._balance,
+      status: this._status,
+      version: this._version,
+    };
+  }
+
+  static fromSnapshot(state: AccountSnapshot): Account {
+    const account = new Account();
+    account._id = state.id;
+    account._owner = state.owner;
+    account._balance = state.balance;
+    account._status = state.status;
+    account._version = state.version;
+    return account;
   }
 }
